@@ -37,6 +37,7 @@ cd
 ln -s path/gzz-goto/bash_aliases
 
 gvim -p ~/.bashrc
+# or use another editor of your choice.
 ```
 
 add 
