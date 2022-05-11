@@ -48,7 +48,7 @@ fi
 
 ## To use from elvish
 
-```elv
+```elvish
 use epm
 
 epm:install github.com/grizzlysmit/gzz-goto
@@ -58,7 +58,7 @@ add this to your rc.elv
 
  - these four lines are optional if you have done the epm:install above then  this is redundant but if you want your rc.elv to be portable then add them anyway
 
-```elv
+```elvish
 use epm
 
 epm:install &silent-if-installed         ^
@@ -67,7 +67,7 @@ epm:install &silent-if-installed         ^
 
  - definately add these lines.
 
-```elv
+```elvish
 use github.com/grizzlysmit/gzz-goto/gt
 
 fn goto {|@_args|
