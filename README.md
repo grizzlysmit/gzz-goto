@@ -35,11 +35,13 @@ ln -s path/gzz-goto/bin/paths.raku
 cd
 
 ln -s path/gzz-goto/bash_aliases
+```
 
 gvim -p .bashrc
 
 add 
 
+```sh
 if [ -e "$HOME/bash_aliases" ]
 then
     source ~/.bash_aliases
