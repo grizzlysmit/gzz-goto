@@ -35,9 +35,9 @@ ln -s path/gzz-goto/bin/paths.raku
 cd
 
 ln -s path/gzz-goto/bash_aliases
-```
 
 gvim -p .bashrc
+```
 
 add 
 
