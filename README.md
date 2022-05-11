@@ -59,6 +59,8 @@ add this to your rc.elv
  - these two lines are optional if you have done the epm:install above then  this is redundant but if you want your rc.elv to be portable then add them anyway
 
 ```elv
+use epm
+
 epm:install &silent-if-installed         ^
      github.com/grizzlysmit/gzz-goto
 ```
