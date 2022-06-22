@@ -36,6 +36,12 @@ cd
 
 ln -s path/gzz-goto/bash_aliases ~/.bash_aliases
 
+or
+
+ln -s path/gzz-goto/bash_aliases ~/.prefered_name 
+
+and adjust bellow.
+
 gvim -p ~/.bashrc
 # or use another editor of your choice.
 ```
