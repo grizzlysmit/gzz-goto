@@ -34,7 +34,7 @@ ln -s path/gzz-goto/bin/paths.raku
 ```sh
 cd
 
-ln -s path/gzz-goto/bash_aliases ~/.bash_aliases
+ln -s path/gzz-goto/bash_aliases ~/.goto_bash_aliases
 
 or
 
@@ -49,9 +49,9 @@ gvim -p ~/.bashrc
 add 
 
 ```sh
-if [ -e "$HOME/.bash_aliases" ]
+if [ -e "$HOME/.goto_bash_aliases" ]
 then
-    source ~/.bash_aliases
+    source ~/.goto_bash_aliases
 fi
 ```
 
