@@ -10,7 +10,7 @@ function eb(){
     then
         exa -FlaahigHb  --colour-scale --time-style=full-iso "$@"
     else
-        ls -Flaghi --colour "$@"
+        ls -Flaghi --color "$@"
     fi
 }
 function goto(){
