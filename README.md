@@ -51,9 +51,12 @@ add
 ```sh
 if [ -e "$HOME/.goto_bash_aliases" ]
 then
+    # shellcheck disable=SC1090
     source ~/.goto_bash_aliases
 fi
 ```
+
+line `# shellcheck disable=SC1090` for those who use shellcheck linter ideally you should use it or something equivalent 
 
 ## To use from elvish
 
