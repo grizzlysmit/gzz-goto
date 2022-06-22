@@ -8,19 +8,9 @@
 function eb(){
     if  type exa >> /dev/null 2>&1 
     then
-        if [ $# -eq 0 ]
-        then
-            exa -FlaahigHb  --colour-scale --time-style=full-iso
-        else
-            exa -FlaahigHb  --colour-scale --time-style=full-iso "$@"
-        fi
+        exa -FlaahigHb  --colour-scale --time-style=full-iso "$@"
     else
-        if [ $# -eq 0 ]
-        then
-            ls -Flaghi --colour
-        else
-            ls -Flaghi --colour "$@"
-        fi
+        ls -Flaghi --colour "$@"
     fi
 }
 function goto(){
