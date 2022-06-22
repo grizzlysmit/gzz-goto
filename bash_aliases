@@ -4,6 +4,14 @@
 # goto function makes getting places in the file system easy #
 #                                                            #
 ##############################################################
+function eb(){
+    if [ type exa >> /dev/null 2>&1 ]
+    then
+        exa -FlaahigHb  --colour-scale --time-style=full-iso "$@"
+    else
+        ls -Flaghi --colour "$@"
+    fi
+}
 function goto(){
    case $# in
        0) cd;;
@@ -14,6 +22,7 @@ function goto(){
           elif [ "$1" == "-" ]
           then
               cd -
+              eb
           else
              arg=$(paths.raku "$1")
              if [ -z "$arg" ]
