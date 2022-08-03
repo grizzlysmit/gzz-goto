@@ -1,0 +1,8 @@
+    # these editors are gui editors
+    # you can define multiple lines like these 
+    # and the system will add to an array of strings 
+    # to treat as guieditors (+= is prefered but = can be used).
+        guieditors  +=  gvim
+        guieditors  +=  xemacs
+        guieditors  +=  gedit
+        guieditors  +=  kate
