@@ -42,12 +42,10 @@ wb                   => ~/work/bin
 ul                   => ~/StudioProjects/ulogger-android
 uapk                 => ~/Downloads/work/ulogger
 knock                => ~/Projects/work/systems/dops-portknocking
-
 home                 => ~
 rkl                  => ~/rakulib
 bin                  => ~/bin
 sos                  => ~/Projects/sernityos
-
 tools                => ~/Projects/work/systems/tools
 key                  => ~/Projects/work/systems/key
 dot                  => ~/Projects/work/dotfiles
@@ -60,14 +58,11 @@ paths                => ~/Projects/Paths
 ycm                  => ~/.vim/bundle/YouCompleteMe
 TeX                  => ~/Documents/TeX
 ext                  => ~/.local/share/gnome-shell/extensions
-
 ext-dev              => ~/Projects/gnome-shell/extensions
 output               => ~/Projects/work/systems/output
 out                  => ~/Projects/work/systems/output
-
 input                => ~/Projects/work/systems/input
 knock-dev            => ~/Projects/work/systems/portknocking.quuvoo4ohcequuox.0.88.io
-
 app.88.io            => ~/Projects/work/systems/app.88.io
 api.q                => ~/Projects/work/systems/api.quuvoo4ohcequuox.0.88.io
 dl                   => ~/Projects/work/systems/dl.88.io
