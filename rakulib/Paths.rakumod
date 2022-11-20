@@ -20,6 +20,7 @@ sub generate-configs(Str $file) returns Bool:D {
     given $file {
         when 'paths.p_th' {
             my Str $content = q:to/END/;
+            #paths #
             home                 => ~
             rkl                  => ~/rakulib
             bin                  => ~/bin
