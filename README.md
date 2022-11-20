@@ -6,7 +6,7 @@ GOTO
 To set up the underpinings 
 
 ```sh
-cd path
+cd <path>
 
 git clone https://github.com/grizzlysmit/gzz-goto.git
 
@@ -16,7 +16,7 @@ mkdir rakulib
 
 cd rakulib
 
-ln -s path/gzz-goto/rakulib/Paths.rakumod
+ln -s <path>/gzz-goto/rakulib/Paths.rakumod
 
 cd
 
@@ -24,7 +24,7 @@ mkdir bin
 
 cd bin
 
-ln -s path/gzz-goto/bin/paths.raku
+ln -s <path>/gzz-goto/bin/paths.raku
 ```
 
 where `<path>` is the path you have chosen to clone the github repository to.
@@ -37,7 +37,7 @@ if you have sysamin privaliges you may want to put config files in `/etc/skel/.l
 
 just run 
 ```sh
-sudo cp -rv path/.local/ /etc/skel/
+sudo cp -rv <path>/.local/ /etc/skel/
 ```
 
 ## To use  from bash
@@ -45,11 +45,11 @@ sudo cp -rv path/.local/ /etc/skel/
 ```sh
 cd
 
-ln -s path/gzz-goto/bash_aliases ~/.goto_bash_aliases
+ln -s <path>/gzz-goto/bash_aliases ~/.goto_bash_aliases
 
 or
 
-ln -s path/gzz-goto/bash_aliases ~/.prefered_name 
+ln -s <path>/gzz-goto/bash_aliases ~/.prefered_name 
 
 and adjust bellow.
 
