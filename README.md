@@ -27,7 +27,7 @@ cd bin
 ln -s path/gzz-goto/bin/paths.raku
 ```
 
-where `&lt;path&gt;` is the path you have chosen to clone the github repository to.
+where `<path>` is the path you have chosen to clone the github repository to.
 
  - make sure $HOME/bin is in your search path, and also raku needs to be installed.
 
