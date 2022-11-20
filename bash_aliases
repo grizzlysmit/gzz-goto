@@ -4,6 +4,12 @@
 # goto function makes getting places in the file system easy #
 #                                                            #
 ##############################################################
+if [ -n "$RAKULIB" ]
+then
+    export RAKULIB=$RAKULIB,$HOME/rakulib
+else
+    export RAKULIB=$HOME/rakulib
+fi
 # shellcheck disable=SC2120
 function eb(){
     if  type exa >> /dev/null 2>&1 
