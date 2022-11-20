@@ -27,7 +27,18 @@ cd bin
 ln -s path/gzz-goto/bin/paths.raku
 ```
 
+where `&lt;path&gt;` is the path you have chosen to clone the github repository to.
+
  - make sure $HOME/bin is in your search path, and also raku needs to be installed.
+
+## config files 
+
+if you have sysamin privaliges you may want to put config files in `/etc/skel/.local/share/paths/`
+
+just run 
+```sh
+sudo cp -rv path/.local/ /etc/skel/
+```
 
 ## To use  from bash
 
