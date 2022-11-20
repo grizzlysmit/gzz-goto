@@ -7,6 +7,86 @@ constant $home is export = %*ENV<HOME>.Str();
 # config files
 constant $config is export = "$home/.local/share/paths";
 
+if $config.IO !~~ :d {
+    $config.IO.mkdir();
+}
+
+# The config files to test for #
+constant @config-files is export = qw{paths.p_th editors};
+
+sub generate-configs(Str $file) returns Bool:D {
+    my Bool $result = True;
+    my IO::CatHandle:D $fd = "$config/$file".IO.open: :w;
+    given $file {
+        when 'paths.p_th' {
+            my Str $content = q:to/END/;
+            home                 => ~
+            rkl                  => ~/rakulib
+            bin                  => ~/bin
+
+            END
+            $content .=trim-trailing;
+            my Bool $r = $fd.put: $content;
+            "could not write $config/$file".say if ! $r;
+            $result ?&= $r;
+        }
+        when 'editors' {
+            my Bool $r = $fd.put: q:to/END/;
+                # these editors are gui editors
+                # you can define multiple lines like these 
+                # and the system will add to an array of strings 
+                # to treat as guieditors (+= is prefered but = can be used).  
+
+            END
+            $content .=trim-trailing;
+            for qw{gvim xemacs kate gedit} -> $guieditor {
+                @guieditors.append($guieditor);
+            }
+            for @guieditors -> $guieditor {
+                $content ~= "\n        guieditors  +=  $guieditor";
+            }
+            "could not write $config/$file".say if ! $r;
+            $result ?&= $r;
+        }
+    } # given $file #
+    my Bool $r = $fd.close;
+    "error closing file: $config/$file".say if ! $r;
+    $result ?&= $r;
+    return $result;
+}
+
+
+my Bool:D $please-edit = False;
+for @config-files -> $file {
+    my Bool $result = True;
+    if "$config/paths.p_th".IO !~~ :f {
+        $please-edit = True;
+        if "/etc/skel/.local/share/paths/$file".IO ~~ :f {
+            try {
+                CATCH {
+                    when X::IO::Copy { 
+                        "could not copy /etc/skel/.local/share/paths/$file -> $config/$file".say;
+                        my Bool $r = generate-configs($file); 
+                        $result ?&= $r;
+                    }
+                }
+                my Bool $r = "/etc/skel/.local/share/paths/$file".IO.copy("$config/$file".IO, :createonly);
+                if $r {
+                    "copied /etc/skel/.local/share/paths/$file -> $config/$file".say;
+                } else {
+                    "could not copy /etc/skel/.local/share/paths/$file -> $config/$file".say;
+                }
+                $result ?&= $r;
+            }
+        } else {
+            my Bool $r = generate-configs($file);
+            "generated $config/$file".say if $r;
+            $result ?&= $r;
+        }
+    }
+} # for @config-files -> $file # 
+edit-configs() if $please-edit;
+
 my Str %the-paths = slurp("$config/paths.p_th").split("\n").map( { my Str $e = $_; $e ~~ s/ '#' .* $$ //; $e } ).map( { $_.trim() } ).grep({ !rx/ [ ^^ \s* '#' .* $$ || ^^ \s* $$ ] / }).map: { my ($key, $value) = $_.split(rx/ \s*  '=>' \s* /, 2); my $e = $key => $value; $e };
 
 # the editor to use #
@@ -62,8 +142,6 @@ if %*ENV<GUI_EDITOR>:exists {
 
 #dd %the-paths;
 
-# The config files to test for #
-constant @config-files is export = qw{editors paths.p_th};
 
 sub resolve-dir(Str $dir, Bool $relitive-to-home = True) returns Str is export {
     my Str $Dir = $dir;
