@@ -6,9 +6,9 @@
 ##############################################################
 if [ -n "$RAKULIB" ]
 then
-    export RAKULIB=$RAKULIB,$HOME/rakulib
+    export RAKULIB="$RAKULIB,$HOME/rakulib"
 else
-    export RAKULIB=$HOME/rakulib
+    export RAKULIB="$HOME/rakulib"
 fi
 # shellcheck disable=SC2120
 function eb(){
