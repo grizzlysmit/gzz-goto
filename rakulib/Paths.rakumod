@@ -14,6 +14,8 @@ if $config.IO !~~ :d {
 # The config files to test for #
 constant @config-files is export = qw{paths.p_th editors};
 
+my Str @guieditors;
+
 sub generate-configs(Str $file) returns Bool:D {
     my Bool $result = True;
     my IO::CatHandle:D $fd = "$config/$file".IO.open: :w;
@@ -32,7 +34,7 @@ sub generate-configs(Str $file) returns Bool:D {
             $result ?&= $r;
         }
         when 'editors' {
-            my Bool $r = $fd.put: q:to/END/;
+            my Str $content = q:to/END/;
                 # these editors are gui editors
                 # you can define multiple lines like these 
                 # and the system will add to an array of strings 
@@ -40,21 +42,22 @@ sub generate-configs(Str $file) returns Bool:D {
 
             END
             $content .=trim-trailing;
-            for qw{gvim xemacs kate gedit} -> $guieditor {
+            for <gvim xemacs kate gedit> -> $guieditor {
                 @guieditors.append($guieditor);
             }
             for @guieditors -> $guieditor {
                 $content ~= "\n        guieditors  +=  $guieditor";
             }
+            my Bool $r = $fd.put: $content;
             "could not write $config/$file".say if ! $r;
             $result ?&= $r;
-        }
+        } # when 'editors' #
     } # given $file #
     my Bool $r = $fd.close;
     "error closing file: $config/$file".say if ! $r;
     $result ?&= $r;
     return $result;
-}
+} # sub generate-configs(Str $file) returns Bool:D #
 
 
 my Bool:D $please-edit = False;
@@ -114,7 +117,7 @@ if %*ENV<GUI_EDITOR>:exists {
 # The default name of the gui editor #
 my Str @gui-editors = slurp("$config/editors").split("\n").map( { my Str $e = $_; $e ~~ s/ '#' .* $$ //; $e } ).map( { $_.trim() } ).grep: { !rx/ [ ^^ \s* '#' .* $$ || ^^ \s* $$ ] / };
 my Str $gui-editor = "";
-my Str @guieditors;
+#my Str @guieditors;
 #@gui-editors.raku.say;
 if @gui-editors {
     #@gui-editors.raku.say;
