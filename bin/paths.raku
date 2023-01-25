@@ -1,6 +1,10 @@
 #!/usr/bin/env raku
 use v6;
 
+my %*SUB-MAIN-OPTS;
+%*SUB-MAIN-OPTS«named-anywhere» = True;
+#%*SUB-MAIN-OPTS<bundling>       = True;
+
 use Paths;
 
 multi sub MAIN(Str:D $key --> int){
@@ -32,8 +36,24 @@ multi sub MAIN('list', 'all', Str $prefix = '', Bool :r(:$resolve) = False) retu
    } 
 }
 
-multi sub MAIN('add', Str:D $key, Str:D $path) returns Int {
-   if add-path($key, $path) {
+multi sub MAIN('add', Str:D $key, Str:D $path, Bool:D :s(:set(:$force)) = False, Str :c(:$comment) = Str) returns Int {
+   if add-path($key, $path, $force, $comment) {
+       exit 0;
+   } else {
+       exit 1;
+   } 
+}
+
+multi sub MAIN('delete', Str:D $key, Bool:D :o(:$comment-out) = False) returns Int {
+   if delete-key($key, $comment-out) {
+       exit 0;
+   } else {
+       exit 1;
+   } 
+}
+
+multi sub MAIN('del', Str:D $key, Bool:D :o(:$comment-out) = False) returns Int {
+   if delete-key($key, $comment-out) {
        exit 0;
    } else {
        exit 1;

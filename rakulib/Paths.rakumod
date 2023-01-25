@@ -250,13 +250,84 @@ sub add-tildes(Str:D $path is copy --> Str:D) {
     return $path;
 }
 
-sub add-path(Str:D $key, Str:D $path --> Bool) is export {
-    return False if %the-paths{$key}:exists;
+sub add-path(Str:D $key, Str:D $path, Bool $force, Str $comment --> Bool) is export {
+    if %the-paths{$key}:exists {
+        if $force {
+            CATCH {
+                when X::IO::Rename {
+                    $*ERR.say: $_;
+                    return False;
+                }
+                default: {
+                    $*ERR.say: $_;
+                    return False;
+                }
+            }
+            my Str $line = sprintf "%-20s => %s", $key, add-tildes($path);
+            with $comment {
+                $line ~= " # $comment";
+            }
+            my IO::Handle:D $in  = "$config/paths.p_th".IO.open: :r, :chomp(True);
+            my IO::Handle:D $out = "$config/paths.p_th.new".IO.open: :w, :chomp(True);
+            my Str $ln;
+            while $ln = $in.get {
+                if $ln ~~ rx/^ \s* <$key> \s* '=>' \s* .* $/ {
+                    $out.say: $line;
+                } else {
+                    $out.say: $ln
+                }
+            }
+            $in.close;
+            $out.close;
+            if "$config/paths.p_th.new".IO.move: "$config/paths.p_th" {
+                return True;
+            } else {
+                return False;
+            }
+        } else {
+            $*ERR.say: "duplicate key use -s|--set|--force to override";
+            return False;
+        }
+    }
     my Str $config-path = "$config/paths.p_th";
-    my Str $line = sprintf "\n%-20s => %s", $key, add-tildes($path);
+    my Str $line = sprintf "%-20s => %s", $key, add-tildes($path);
+    with $comment {
+        $line ~= " # $comment";
+    }
+    $line ~= "\n";
     $config-path.IO.spurt($line, :append);
     return True;
-}
+} # sub add-path(Str:D $key, Str:D $path, Bool $force, Str $comment --> Bool) is export #
+
+sub delete-key(Str:D $key, Bool:D $comment-out --> Bool) is export {
+    CATCH {
+        when X::IO::Rename {
+            $*ERR.say: $_;
+            return False;
+        }
+        default: {
+            $*ERR.say: $_;
+            return False;
+        }
+    }
+    my IO::Handle:D $in  = "$config/paths.p_th".IO.open: :r, :chomp(True);
+    my IO::Handle:D $out = "$config/paths.p_th.new".IO.open: :w, :chomp(True);
+    my Str $ln;
+    while $ln = $in.get {
+        if $ln ~~ rx/^ \s* <$key> \s* '=>' \s* .* $/ {
+            $out.say: "# $ln" if $comment-out;
+        } else {
+            $out.say: $ln
+        }
+    }
+    $in.close;
+    $out.close;
+    if "$config/paths.p_th.new".IO.move: "$config/paths.p_th" {
+        return True;
+    } else {
+        return False;
+    }
+} # sub delete-key(Str:D $key, Bool:D $comment-out --> Bool) is export #
 
 sub add-alias(Str:D $key, Str:D $target --> Bool) is export {
     return False if %the-paths{$target}:!exists;
