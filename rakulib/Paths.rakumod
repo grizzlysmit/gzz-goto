@@ -306,11 +306,15 @@ sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length 
             $cnt++;
             if $cnt % $page-length == 0 {
                 with $comment-present {
+                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
+                    $cnt++;
                     put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s => %-*s # %-*s", $key-width, 'key', $value-width, 'value', $comment-width, 'comment') ~ t.text-reset;
                     $cnt++;
                     put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
                     $cnt++;
                 } else {
+                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
+                    $cnt++;
                     put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s => %-*s", $key-width, 'key', $value-width, 'value') ~ t.text-reset;
                     $cnt++;
                     put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
@@ -322,11 +326,15 @@ sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length 
             $cnt++;
             if $cnt % $page-length == 0 {
                 with $comment-present {
+                    say '=' x $width;
+                    $cnt++;
                     printf("%-*s => %-*s # %-*s\n", $key-width, 'key', $value-width, 'value', $comment-width, 'comment');
                     $cnt++;
                     say '=' x $width;
                     $cnt++;
                 } else {
+                    say '=' x $width;
+                    $cnt++;
                     printf("%-*s => %-*s\n", $key-width, 'key', $value-width, 'value');
                     $cnt++;
                     say '=' x $width;
