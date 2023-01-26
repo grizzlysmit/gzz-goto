@@ -223,9 +223,29 @@ sub list-keys(Str $prefix = '' --> Array[Str]) is export {
 }
 
 sub say-list-keys(Str $prefix = '' --> Bool:D) is export {
-    my @keys = list-keys($prefix).sort;
+    my @keys = list-keys($prefix).sort: { .lc };
+    my Int:D $key-width        = 0;
+    my Int:D $comment-width    = 0;
     for @keys -> $key {
-        $key.say;
+        my Str %val = %the-lot{$key};
+        my Str $comment = %val«comment»;
+        $key-width         = max($key-width,     wcswidth($key));
+        with $comment {
+            $comment-width = max($comment-width, wcswidth($comment));
+        } else {
+            $key.say;
+        }
+    }
+    $key-width     += 2;
+    $comment-width += 2;
+    for @keys -> $key {
+        my Str %val = %the-lot{$key};
+        my Str $comment = %val«comment»;
+        with $comment {
+            printf "%-*s # %-*s\n", $key-width, $key, $comment-width, $comment;
+        } else {
+            $key.say;
+        }
     }
     return True;
 }
@@ -300,7 +320,7 @@ sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length 
             $cnt++;
         }
     }
-    for @result.sort -> $value {
+    for @result.sort( { .lc } ) -> $value {
         if $colour {
             put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, $value) ~ t.text-reset;
             $cnt++;
