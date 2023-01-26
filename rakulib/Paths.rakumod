@@ -113,7 +113,7 @@ role Paths {
     token path-segments { <path-segment>+ % '/' }
 }
 
-role PathActions {
+role PathsActions {
     method path($/) {
         my Str $abs-rel-path;
         with $/<absolute-path> {
@@ -215,6 +215,22 @@ class PathFileActions does KeyActions does PathActions {
         make $/<key>.made => %val;
     }
     method target ($/) { make $/<key>.made }
+}
+
+grammar KeyValid does Key {
+    token TOP { <key> }
+}
+
+class KeyValidAction does KeyActions {
+    method TOP($/) { make $/<TOP>.made }
+}
+
+grammar Path does Paths {
+    token TOP { <path> }
+}
+
+class PathActions does PathsActions {
+    method TOP($/) { make $/<TOP>.made }
 }
 
 my Str  @lines     = slurp("$config/paths.p_th").split("\n");
