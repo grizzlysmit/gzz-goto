@@ -93,6 +93,130 @@ for @config-files -> $file {
 } # for @config-files -> $file # 
 edit-configs() if $please-edit;
 
+role Key {
+    token key { \w+ [ [ '-' | '.' | '+' | '@' ]+ \w* ]* }
+}
+
+role KeyActions {
+    method key($/) {
+        make $/<key>.made
+    }
+}
+
+role Paths {
+    token path          { [ <absolute-path> | <relative-path> ] }
+    token absolute-path { [ <sep> | <tilde> | <tilde> <path-segment> <sep> | <tilde> <sep> ] [ <path-segments> ]? }
+    token tilde         { '~' }
+    token sep           { '/' }
+    token relative-path { <path-segments> }
+    token path-segment  { \w+ [ <-[ / ]>+ \w* ]* }
+    token path-segments { <path-segment>+ % '/' }
+}
+
+role PathActions {
+    method path($/) {
+        my Str $abs-rel-path;
+        with $/<absolute-path> {
+            $abs-rel-path = $/<absolute-path>.made;
+        } orwith $/<relative-path> {
+            $abs-rel-path = $/<relative-path>.made;
+        }
+        make $abs-rel-path;
+    }
+    method absolute-path($/) {
+        my Str $abs-path;
+        with $/<path-segments> {
+            if ~$/.starts-with('/') {
+                $abs-path = $/.made ~ $/<path-segments>.made;
+            } elsif ~$/.starts-with('~/') {
+                $abs-path = $/<tilde>.made ~ $<sep>.made ~ $/<path-segments>.made;
+            } elsif ~$/.starts-with('~') {
+                with $/<path-segment> {
+                    $abs-path = $/<tilde>.made ~ $/<path-segment>.made ~ $/<sep>.made ~ $/<path-segments>.made;
+                } else {
+                    $abs-path = $/<tilde>.made ~ $/<path-segments>.made;
+                }
+            }
+        } else {
+            if ~$/ eq '~' {
+                $abs-path = $/<tilde>.made;
+            } elsif ~$/ eq '~/' {
+                $abs-path = $/<tilde>.made ~ $/<sep>.made;
+            } elsif ~$/ eq '/' {
+                $abs-path = $/<sep>.made;
+            } elsif ~$/.starts-with('/') {
+                $abs-path = $/<sep>.made ~ $/<path-segments>.made;
+            } elsif ~$/.starts-with('~') {
+                $abs-path = $/<tilde>.made ~ $/<path-segment>.made ~ $/<sep>.made ~ $/<path-segments>.made;
+            }
+        }
+        make $abs-path;
+    }
+    method tilde($/) { make $/<tilde>.made }
+    method sep($/)   { make $/<sep>.made }
+    method path-relative($/) {
+        make $/<path-segments>.made
+    }
+    method path-segment($/) { make $/.made }
+    method path-segments($/) {
+        my @made-elts = gather for $/<path-segment> {
+            take $_.made
+        };
+        make @made-elts.join('/');
+    }
+}
+
+grammar PathsFile does Key does Paths {
+    token TOP           {  <line>+ % "\n" }
+    token line          { [ <_line> | '#' <.ws> <comment> ]? }
+    token _line         { <.ws> [ <dir> | <alias> ] }
+    token comment       { .* }
+    token dir           { <key> <.ws> '=>' <.ws> <path> <.ws> [ '#' <.ws> <comment> ]? }
+    token alias         { <key> <.ws> '-->' <.ws> <target> <.ws> [ '#' <.ws> <comment> ]? }
+    token target        { <key> }
+}
+
+class PathFileActions does KeyActions does PathActions {
+    method TOP($/) {
+        my %made-elts = gather for $/<line> {
+            $_.made
+        };
+        make %made-elts;
+    }
+    method line($/) {
+        with $/<_line> {
+            make $/<_line>.made;
+        } orwith $/<comment> {
+            sink $/<comment>.made;
+        }
+    }
+    method _line($/) {
+        my %val;
+        with $/<dir> {
+            %val = $/<dir>.made;
+        } orwith $/<alias> {
+            %val = $/<alias>.made;
+        }
+        make %val;
+    }
+    method comment($/) { make $/<comment>.made }
+    method dir    ($/) {
+        my %val = type => 'dir', value => $/<path>.made;
+        with $/<comment> {
+            %val«comment» = $/<comment>.made;
+        }
+        make $/<key>.made => %val;
+    }
+    method alias  ($/) {
+        my %val =  type => 'alias', value => $/<target>.made;
+        with $/<comment> {
+            %val«comment» = $/<comment>.made;
+        }
+        make $/<key>.made => %val;
+    }
+    method target ($/) { make $/<key>.made }
+}
+
 my Str  @lines     = slurp("$config/paths.p_th").split("\n");
 my Str  %the-paths = @lines.map( { my Str $e = $_; $e ~~ s/ '#' .* $$ //; $e } ).map( { $_.trim() } ).grep({ !rx/ [ ^^ \s* '#' .* $$ || ^^ \s* $$ ] / }).map: { my ($key, $value) = $_.split(rx/ \s*  '=>' \s* /, 2); my $e = $key => $value; $e };
 my Hash %the-lot   = @lines.grep({ !rx/ [ ^^ \s* '#' .* $$ || ^^ \s* $$ ] / }).map: { my $e = $_; ($e ~~ rx/^ \s* $<key> = [ \w+ [ [ '.' || '-' || '@' || '+' ]+ \w* ]* ] \s* '=>' \s* $<path> = [ <-[ # ]>+ ] \s* [ '#' \s* $<comment> = [ .* ] ]?  $/) ?? (~$<key> => { value => (~$<path>).trim, comment => ($<comment> ?? ~$<comment> !! Str), }) !! { my ($key, $value) = $_.split(rx/ \s*  '=>' \s* /, 2); my $r = $key => $value; $r } };
