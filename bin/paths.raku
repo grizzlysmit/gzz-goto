@@ -28,13 +28,13 @@ multi sub MAIN('list', 'keys', Str $prefix = '') returns Int {
    } 
 }
 
-multi sub MAIN('list', 'all', Str $prefix = '', Bool :r(:$resolve) = False) returns Int {
-   if list-all($prefix, $resolve) {
+multi sub MAIN('list', 'all', Str:D $prefix = '', Bool:D :r(:$resolve) = False, Bool:D :c(:color(:$colour)) = False, Int:D :p(:$page-length) = 50) returns Int {
+   if list-all($prefix, $resolve, $colour, $page-length) {
        exit 0;
    } else {
        exit 1;
    } 
-}
+} # multi sub MAIN('list', 'all', Str $prefix = '', Bool:D :r(:$resolve) = False, Bool:D :c(:color(:$colour)) = False) returns Int #
 
 multi sub MAIN('add', Str:D $key, Str:D $path, Bool:D :s(:set(:$force)) = False, Str :c(:$comment) = Str) returns Int {
    if add-path($key, $path, $force, $comment) {
@@ -60,8 +60,24 @@ multi sub MAIN('del', Str:D $key, Bool:D :o(:$comment-out) = False) returns Int 
    } 
 }
 
-multi sub MAIN('alias', Str:D $key, Str:D $path) returns Int {
-   if add-alias($key, $path) {
+multi sub MAIN('tidy', 'file') returns Int {
+   if tidy-file() {
+       exit 0;
+   } else {
+       exit 1;
+   } 
+}
+
+multi sub MAIN('alias', Str:D $key, Str:D $target, Bool:D :s(:set(:$force)) = False, Str :c(:$comment) = Str) returns Int {
+   if add-alias($key, $target, $force, $comment) {
+       exit 0;
+   } else {
+       exit 1;
+   } 
+}
+
+multi sub MAIN('comment', Str:D $key, Str:D $comment) returns Int {
+   if add-comment($key, $comment) {
        exit 0;
    } else {
        exit 1;
