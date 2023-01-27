@@ -94,22 +94,20 @@ for @config-files -> $file {
 edit-configs() if $please-edit;
 
 role Key {
-    token key { \w+ [ [ '-' | '.' | '+' | '@' ]+ \w* ]* }
+    regex key { \w+ [ [ '-' || '.' || '+' || '@' ]+ \w* ]* }
 }
 
 role KeyActions {
-    method key($/) {
-        make $/<key>.made
+    method _key($/) {
+        make $/<_key>.made
     }
 }
 
 role Paths {
-    token path          { [ <absolute-path> | <relative-path> ] }
-    token absolute-path { [ <sep> | <tilde> | <tilde> <path-segment> <sep> | <tilde> <sep> ] [ <path-segments> ]? }
-    token tilde         { '~' }
-    token sep           { '/' }
+    token path         { [ <absolute-path> | <relative-path> ] }
+    token absolute-path { [ '/' | '~' | '~/' ]  <path-segments>? }
     token relative-path { <path-segments> }
-    token path-segment  { \w+ [ <-[ / ]>+ \w* ]* }
+    token path-segment  { \w+ [ <-[\ \/]>+ \w* ]* }
     token path-segments { <path-segment>+ % '/' }
 }
 
@@ -117,8 +115,10 @@ role PathsActions {
     method path($/) {
         my Str $abs-rel-path;
         with $/<absolute-path> {
+            dd $/<absolute-path>.made;
             $abs-rel-path = $/<absolute-path>.made;
         } orwith $/<relative-path> {
+            dd $/<relative-path>.made;
             $abs-rel-path = $/<relative-path>.made;
         }
         make $abs-rel-path;
@@ -127,75 +127,53 @@ role PathsActions {
         my Str $abs-path;
         with $/<path-segments> {
             if ~$/.starts-with('/') {
-                $abs-path = $/.made ~ $/<path-segments>.made;
+                $abs-path = '/' ~ $/<path-segments>».made;
             } elsif ~$/.starts-with('~/') {
-                $abs-path = $/<tilde>.made ~ $<sep>.made ~ $/<path-segments>.made;
+                $abs-path = '~/' ~ $/<path-segments>».made;
             } elsif ~$/.starts-with('~') {
-                with $/<path-segment> {
-                    $abs-path = $/<tilde>.made ~ $/<path-segment>.made ~ $/<sep>.made ~ $/<path-segments>.made;
-                } else {
-                    $abs-path = $/<tilde>.made ~ $/<path-segments>.made;
-                }
+                $abs-path = '~' ~ $/<path-segments>».made;
             }
         } else {
             if ~$/ eq '~' {
-                $abs-path = $/<tilde>.made;
+                $abs-path = $/.made;
             } elsif ~$/ eq '~/' {
-                $abs-path = $/<tilde>.made ~ $/<sep>.made;
+                $abs-path = $/.made;
+                $abs-path ~~ s!\/$!!;
             } elsif ~$/ eq '/' {
-                $abs-path = $/<sep>.made;
-            } elsif ~$/.starts-with('/') {
-                $abs-path = $/<sep>.made ~ $/<path-segments>.made;
-            } elsif ~$/.starts-with('~') {
-                $abs-path = $/<tilde>.made ~ $/<path-segment>.made ~ $/<sep>.made ~ $/<path-segments>.made;
+                $abs-path = $/.made;
             }
         }
         make $abs-path;
     }
-    method tilde($/) { make $/<tilde>.made }
-    method sep($/)   { make $/<sep>.made }
     method path-relative($/) {
-        make $/<path-segments>.made
+        make $/<path-segments>».made
     }
     method path-segment($/) { make $/.made }
     method path-segments($/) {
-        my @made-elts = gather for $/<path-segment> {
-            take $_.made
-        };
+        my @made-elts = $/».made.split('/');
         make @made-elts.join('/');
     }
 }
 
 grammar PathsFile does Key does Paths {
     token TOP           {  <line>+ % "\n" }
-    token line          { [ <_line> | '#' <.ws> <comment> ]? }
-    token _line         { <.ws> [ <dir> | <alias> ] }
+    token line         { \s* [ <dir> | <alias> ] }
+    token dir           { <key> \s* '=>' \s* <path> \s* [ '#' \s* <comment> ]? }
+    token alias         { <key> \s* '-->' \s* <target=.key> \s* [ '#' \s* <comment> ]? }
     token comment       { .* }
-    token dir           { <key> <.ws> '=>' <.ws> <path> <.ws> [ '#' <.ws> <comment> ]? }
-    token alias         { <key> <.ws> '-->' <.ws> <target> <.ws> [ '#' <.ws> <comment> ]? }
-    token target        { <key> }
 }
 
-class PathFileActions does KeyActions does PathActions {
+class PathFileActions does KeyActions does PathsActions {
     method TOP($/) {
-        my %made-elts = gather for $/<line> {
-            $_.made
-        };
+        my %made-elts = $/<line>».made;
         make %made-elts;
     }
     method line($/) {
-        with $/<_line> {
-            make $/<_line>.made;
-        } orwith $/<comment> {
-            sink $/<comment>.made;
-        }
-    }
-    method _line($/) {
         my %val;
         with $/<dir> {
-            %val = $/<dir>.made;
+            %val = $/<dir>».made;
         } orwith $/<alias> {
-            %val = $/<alias>.made;
+            %val = $/<alias>».made;
         }
         make %val;
     }
@@ -215,7 +193,7 @@ class PathFileActions does KeyActions does PathActions {
         make $/<key>.made => %val;
     }
     method target ($/) { make $/<key>.made }
-}
+} # class PathFileActions does KeyActions does PathsActions #
 
 grammar KeyValid does Key {
     token TOP { <key> }
@@ -236,6 +214,9 @@ class PathActions does PathsActions {
 my Str  @lines     = slurp("$config/paths.p_th").split("\n");
 my Str  %the-paths = @lines.map( { my Str $e = $_; $e ~~ s/ '#' .* $$ //; $e } ).map( { $_.trim() } ).grep({ !rx/ [ ^^ \s* '#' .* $$ || ^^ \s* $$ ] / }).map: { my ($key, $value) = $_.split(rx/ \s*  '=>' \s* /, 2); my $e = $key => $value; $e };
 my Hash %the-lot   = @lines.grep({ !rx/ [ ^^ \s* '#' .* $$ || ^^ \s* $$ ] / }).map: { my $e = $_; ($e ~~ rx/^ \s* $<key> = [ \w+ [ [ '.' || '-' || '@' || '+' ]+ \w* ]* ] \s* '=>' \s* $<path> = [ <-[ # ]>+ ] \s* [ '#' \s* $<comment> = [ .* ] ]?  $/) ?? (~$<key> => { value => (~$<path>).trim, comment => ($<comment> ?? ~$<comment> !! Str), }) !! { my ($key, $value) = $_.split(rx/ \s*  '=>' \s* /, 2); my $r = $key => $value; $r } };
+my $tmp = PathsFile.parse(@lines.grep({ !rx/^ [ \s* '#' .* || \s* ] $/ }).join("\n"), actions  => PathFileActions.new).made;
+dd $tmp;
+#my Hash %the-lot   = PathsFile.parse(@lines.join("\n"), actions  => PathFileActions.new).made;
 
 # the editor to use #
 my Str $editor = '';
@@ -290,7 +271,7 @@ if %*ENV<GUI_EDITOR>:exists {
 
 
 
-sub resolve-dir(Str $dir, Bool $relitive-to-home = True) returns Str is export {
+sub resolve-dir(Str $dir, Bool $relative-to-home = True) returns Str is export {
     my Str $Dir = $dir.trim;
     #$Dir.say;
     $Dir = $home if $Dir eq '~';
@@ -312,7 +293,7 @@ sub resolve-dir(Str $dir, Bool $relitive-to-home = True) returns Str is export {
             }
         }
     }
-    $Dir = "$home/$Dir" if $relitive-to-home && $Dir !~~ rx! ^^ \/ !;
+    $Dir = "$home/$Dir" if $relative-to-home && $Dir !~~ rx! ^^ \/ !;
     #$Dir.say;
     return $Dir;
 }
