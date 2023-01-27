@@ -98,8 +98,8 @@ role Key {
 }
 
 role KeyActions {
-    method _key($/) {
-        make $/<_key>.made
+    method key($/) {
+        make $/<key>.made
     }
 }
 
@@ -107,7 +107,7 @@ role Paths {
     token path         { [ <absolute-path> | <relative-path> ] }
     token absolute-path { [ '/' | '~' | '~/' ]  <path-segments>? }
     token relative-path { <path-segments> }
-    token path-segment  { \w+ [ <-[\ \/]>+ \w* ]* }
+    regex path-segment  { \w+ [ <-[\ \/]>+ \w* ]* }
     token path-segments { <path-segment>+ % '/' }
 }
 
@@ -126,6 +126,7 @@ role PathsActions {
     method absolute-path($/) {
         my Str $abs-path;
         with $/<path-segments> {
+            dd $/<path-segments>.made;
             if ~$/.starts-with('/') {
                 $abs-path = '/' ~ $/<path-segments>».made;
             } elsif ~$/.starts-with('~/') {
@@ -148,9 +149,10 @@ role PathsActions {
     method path-relative($/) {
         make $/<path-segments>».made
     }
-    method path-segment($/) { make $/.made }
+    method path-segment($/) { make $/<path-segment>.made }
     method path-segments($/) {
         my @made-elts = $/».made.split('/');
+        dd @made-elts;
         make @made-elts.join('/');
     }
 }
