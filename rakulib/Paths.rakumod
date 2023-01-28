@@ -330,8 +330,15 @@ sub path(Str:D $go-here --> Str:D) is export {
         $return        = %val«value»;
         my Str:D $type = %val«type»;
         if $type eq 'alias' {
-            $return = resolve-dir(resolve-alias($return));
+            $return = resolve-alias($return);
+            if $return.trim eq '' {
+                return $return;
+            }
+            $return = resolve-dir($return);
         } else {
+            if $return.trim eq '' {
+                return $return;
+            }
             $return = resolve-dir($return);
         }
     }
