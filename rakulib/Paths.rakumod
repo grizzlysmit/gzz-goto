@@ -371,18 +371,18 @@ sub edit-configs() returns Bool:D is export {
     }
 }
 
-sub list-keys(Str $prefix = '' --> Array[Str]) is export {
+sub list-keys(Str $prefix, Regex:D $pattern --> Array[Str]) is export {
     my Str @keys;
     for %the-lot.keys -> $key {
-        if $key.starts-with($prefix, :ignorecase) {
+        if $key.starts-with($prefix, :ignorecase) && $key ~~ $pattern {
             @keys.push($key);
         }
     }
     return @keys;
 }
 
-sub say-list-keys(Str $prefix = '' --> Bool:D) is export {
-    my @keys = list-keys($prefix).sort: { .lc };
+sub say-list-keys(Str $prefix, Regex:D $pattern --> Bool:D) is export {
+    my @keys = list-keys($prefix, $pattern).sort: { .lc };
     my Int:D $key-width        = 0;
     my Int:D $comment-width    = 0;
     for @keys -> $key {
@@ -418,13 +418,13 @@ sub centre(Str:D $text, Int:D $width is copy, Str:D $fill = ' ' --> Str) {
     return $result;
 }
 
-sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length --> Bool:D) is export {
+sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length, Regex:D $pattern --> Bool:D) is export {
     my Str @result;
     my Int:D $key-width        = 0;
     my Int:D $value-width      = 0;
     my Int:D $comment-width    = 0;
     for %the-lot.kv -> $key, %val {
-        if $key.starts-with($prefix, :ignorecase) {
+        if $key.starts-with($prefix, :ignorecase) && $key ~~ $pattern {
             my Str $value      = %val«value»;
             my Str $comment    = %val«comment» // Str;
             without $value {
@@ -446,7 +446,7 @@ sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length 
     $comment-width += 2;
     my Bool:D $comment-present = False;
     for %the-lot.kv -> $key, %val {
-        if $key.starts-with($prefix, :ignorecase) {
+        if $key.starts-with($prefix, :ignorecase) && $key ~~ $pattern {
             my Str:D $value     = %val«value»;
             my Str   $comment   = %val«comment» // Str;
             my Str:D $type      = %val«type»;
@@ -546,7 +546,7 @@ sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length 
         "".say;
     }
     return True;
-} # sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length --> Bool:D) is export #
+} # sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length, Regex:D $pattern --> Bool:D) is export #
 
 sub add-tildes(Str:D $path is copy --> Str:D) {
     $path .=trim;

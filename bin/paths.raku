@@ -20,21 +20,37 @@ multi sub MAIN('edit', 'configs') returns Int {
    } 
 }
 
-multi sub MAIN('list', 'keys', Str $prefix = '') returns Int {
-   if say-list-keys($prefix) {
+multi sub MAIN('list', 'keys', Str $prefix = '', Str :p(:$pattern) = Str, Str :e(:$emca-pattern) = Str) returns Int {
+    my Regex $_pattern;
+    with $pattern {
+        $_pattern = rx:i/ <$pattern> /;
+    } orwith $emca-pattern {
+        $_pattern = ECMA262Regex.compile("^$emca-pattern\$");
+    } else {
+        $_pattern = rx:i/^ .* $/;
+    }
+    if say-list-keys($prefix, $_pattern) {
        exit 0;
-   } else {
+    } else {
        exit 1;
-   } 
+    } 
 }
 
-multi sub MAIN('list', 'all', Str:D $prefix = '', Bool:D :r(:$resolve) = False, Bool:D :c(:color(:$colour)) = False, Int:D :p(:$page-length) = 50) returns Int {
-   if list-all($prefix, $resolve, $colour, $page-length) {
+multi sub MAIN('list', 'all', Str:D $prefix = '', Bool:D :r(:$resolve) = False, Bool:D :c(:color(:$colour)) = False, Int:D :p(:$page-length) = 50, Str :p(:$pattern) = Str, Str :e(:$emca-pattern) = Str) returns Int {
+    my Regex $_pattern;
+    with $pattern {
+        $_pattern = rx:i/ <$pattern> /;
+    } orwith $emca-pattern {
+        $_pattern = ECMA262Regex.compile("^$emca-pattern\$");
+    } else {
+        $_pattern = rx:i/^ .* $/;
+    }
+    if list-all($prefix, $resolve, $colour, $page-length, $_pattern) {
        exit 0;
-   } else {
+    } else {
        exit 1;
-   } 
-} # multi sub MAIN('list', 'all', Str $prefix = '', Bool:D :r(:$resolve) = False, Bool:D :c(:color(:$colour)) = False) returns Int #
+    } 
+} # multi sub MAIN('list', 'all', Str $prefix = '', Bool:D :r(:$resolve) = False, Bool:D :c(:color(:$colour)) = False, Str :p(:$pattern) = Str, Str :e(:$emca-pattern) = Str) returns Int #
 
 multi sub MAIN('add', Str:D $key, Str:D $path, Bool:D :s(:set(:$force)) = False, Str :c(:$comment) = Str) returns Int {
    if add-path($key, $path, $force, $comment) {
