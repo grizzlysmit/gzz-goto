@@ -427,6 +427,12 @@ sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length 
         if $key.starts-with($prefix, :ignorecase) {
             my Str $value      = %val«value»;
             my Str $comment    = %val«comment» // Str;
+            without $value {
+                next;
+            }
+            if $value.trim eq '' {
+                next;
+            }
             $value             = resolve-dir($value) if $resolve;
             $key-width         = max($key-width,     wcswidth($key));
             $value-width       = max($value-width,   wcswidth($value));
@@ -445,6 +451,12 @@ sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length 
             my Str   $comment   = %val«comment» // Str;
             my Str:D $type      = %val«type»;
             my Str:D $type-spec = '-->';
+            without $value {
+                next;
+            }
+            if $value.trim eq '' {
+                next;
+            }
             if $type eq 'dir' {
                 $value = resolve-dir($value) if $resolve;
                 $type-spec = ' =>';
