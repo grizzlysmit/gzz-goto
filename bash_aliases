@@ -33,6 +33,7 @@ function goto(){
               eb
           else
              arg=$(paths.raku "$1")
+             echo "\$arg == \`$arg'"
              if [ -z "$arg" ]
              then
                  echo "error: $1 not found"
@@ -40,6 +41,7 @@ function goto(){
                  cd "$arg"
                  # shellcheck disable=SC2119
                  eb
+                 echo "\$arg == \`$arg'"
              fi
           fi;;
       *) paths.raku "$@";;

@@ -68,8 +68,8 @@ multi sub MAIN('tidy', 'file') returns Int {
    } 
 }
 
-multi sub MAIN('alias', Str:D $key, Str:D $target, Bool:D :s(:set(:$force)) = False, Str :c(:$comment) = Str) returns Int {
-   if add-alias($key, $target, $force, $comment) {
+multi sub MAIN('alias', Str:D $key, Str:D $target, Bool:D :s(:set(:$force)) = False, Bool:D :d(:really-force(:$overwrite-dirs)) = False, Str :c(:$comment) = Str) returns Int {
+   if add-alias($key, $target, $force, $overwrite-dirs, $comment) {
        exit 0;
    } else {
        exit 1;

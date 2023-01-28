@@ -93,111 +93,103 @@ for @config-files -> $file {
 } # for @config-files -> $file # 
 edit-configs() if $please-edit;
 
-role Key {
-    regex key { \w+ [ [ '-' || '.' || '+' || '@' ]+ \w* ]* }
+grammar Key {
+    regex key { \w* [ <-[\h]>+ \w* ]* }
 }
 
 role KeyActions {
     method key($/) {
-        make $/<key>.made
+        my $k = (~$/).trim;
+        make $k;
     }
 }
 
-role Paths {
+grammar Paths {
     token path         { [ <absolute-path> | <relative-path> ] }
     token absolute-path { [ '/' | '~' | '~/' ]  <path-segments>? }
     token relative-path { <path-segments> }
-    regex path-segment  { \w+ [ <-[\ \/]>+ \w* ]* }
-    token path-segments { <path-segment>+ % '/' }
+    regex path-segments { <path-segment> [ '/' <path-segment> ]* '/'? }
+    regex path-segment  { \w* [ [ '-' || \h || '+' || ':' || '@' || '=' || '!' || ',' || '&' || '&' || '%' || '$' || '(' || ')' '[' || ']' || '{' || '}' || ';' || '.' ]+ \w* ]* }
 }
 
 role PathsActions {
     method path($/) {
         my Str $abs-rel-path;
-        with $/<absolute-path> {
-            dd $/<absolute-path>.made;
+        if $/<absolute-path> {
             $abs-rel-path = $/<absolute-path>.made;
-        } orwith $/<relative-path> {
-            dd $/<relative-path>.made;
+        } elsif $/<relative-path> {
             $abs-rel-path = $/<relative-path>.made;
         }
         make $abs-rel-path;
     }
     method absolute-path($/) {
         my Str $abs-path;
-        with $/<path-segments> {
-            dd $/<path-segments>.made;
-            if ~$/.starts-with('/') {
-                $abs-path = '/' ~ $/<path-segments>».made;
-            } elsif ~$/.starts-with('~/') {
-                $abs-path = '~/' ~ $/<path-segments>».made;
-            } elsif ~$/.starts-with('~') {
-                $abs-path = '~' ~ $/<path-segments>».made;
-            }
+        if $/<path-segments> {
+            $abs-path = ~$/.trim;
         } else {
-            if ~$/ eq '~' {
-                $abs-path = $/.made;
-            } elsif ~$/ eq '~/' {
-                $abs-path = $/.made;
-                $abs-path ~~ s!\/$!!;
-            } elsif ~$/ eq '/' {
-                $abs-path = $/.made;
-            }
+            $abs-path = ~$/.trim;
         }
         make $abs-path;
     }
     method path-relative($/) {
-        make $/<path-segments>».made
+        make ~$/.trim
     }
     method path-segment($/) { make $/<path-segment>.made }
     method path-segments($/) {
-        my @made-elts = $/».made.split('/');
-        dd @made-elts;
-        make @made-elts.join('/');
+        #my @made-elts = $/».made;
+        #make @made-elts.join('/');
     }
 }
 
-grammar PathsFile does Key does Paths {
-    token TOP           {  <line>+ % "\n" }
-    token line         { \s* [ <dir> | <alias> ] }
-    token dir           { <key> \s* '=>' \s* <path> \s* [ '#' \s* <comment> ]? }
-    token alias         { <key> \s* '-->' \s* <target=.key> \s* [ '#' \s* <comment> ]? }
-    token comment       { .* }
+grammar PathsFile is Key is Paths {
+    token TOP           { <line> [ \v+ <line> ]* \v* }
+    token line          { [ <dir> | <alias> ] }
+    token dir           { <key> \h* '=>' \h* <path> \h* [ '#' \h* <comment> \h* ]? }
+    token alias         { <key> \h* '-->' \h* <target=.key> \h* [ '#' \h* <comment> \h* ]? }
+    token comment       { <-[\n]>* }
 }
 
 class PathFileActions does KeyActions does PathsActions {
-    method TOP($/) {
-        my %made-elts = $/<line>».made;
-        make %made-elts;
-    }
     method line($/) {
         my %val;
-        with $/<dir> {
-            %val = $/<dir>».made;
-        } orwith $/<alias> {
-            %val = $/<alias>».made;
+        if $/<dir> {
+            %val = $/<dir>.made;
+        } elsif $/<alias> {
+            %val = $/<alias>.made;
         }
         make %val;
     }
     method comment($/) { make $/<comment>.made }
     method dir    ($/) {
         my %val = type => 'dir', value => $/<path>.made;
-        with $/<comment> {
-            %val«comment» = $/<comment>.made;
+        if $/<comment> {
+            my $com = ~($/<comment>).trim;
+            #$com ~~ s:g/ $<closer> = [ '}' ] /\\$<closer>/;
+            %val«comment» = $com;
+        } else {
+            my $k = ~$/<key>;
+            my $msg = "No comment for this one: $k line $?LINE";
         }
         make $/<key>.made => %val;
     }
     method alias  ($/) {
         my %val =  type => 'alias', value => $/<target>.made;
-        with $/<comment> {
-            %val«comment» = $/<comment>.made;
+        if $/<comment> {
+            my $com = ~($/<comment>).trim;
+            #$com ~~ s:g/ $<closer> = [ '}' ] /\\$<closer>/;
+            %val«comment» = $com;
         }
         make $/<key>.made => %val;
     }
     method target ($/) { make $/<key>.made }
+    method TOP($match) {
+        my %made-elelements = $match<line>».made;
+        my @me = |%made-elelements;
+        $match.make: @me;
+    }
 } # class PathFileActions does KeyActions does PathsActions #
 
-grammar KeyValid does Key {
+grammar KeyValid is Key {
     token TOP { <key> }
 }
 
@@ -205,19 +197,28 @@ class KeyValidAction does KeyActions {
     method TOP($/) { make $/<TOP>.made }
 }
 
-grammar Path does Paths {
+grammar Path is Paths {
     token TOP { <path> }
 }
 
-class PathActions does PathsActions {
+class PathValidActions does PathsActions {
     method TOP($/) { make $/<TOP>.made }
 }
 
-my Str  @lines     = slurp("$config/paths.p_th").split("\n");
-my Str  %the-paths = @lines.map( { my Str $e = $_; $e ~~ s/ '#' .* $$ //; $e } ).map( { $_.trim() } ).grep({ !rx/ [ ^^ \s* '#' .* $$ || ^^ \s* $$ ] / }).map: { my ($key, $value) = $_.split(rx/ \s*  '=>' \s* /, 2); my $e = $key => $value; $e };
-my Hash %the-lot   = @lines.grep({ !rx/ [ ^^ \s* '#' .* $$ || ^^ \s* $$ ] / }).map: { my $e = $_; ($e ~~ rx/^ \s* $<key> = [ \w+ [ [ '.' || '-' || '@' || '+' ]+ \w* ]* ] \s* '=>' \s* $<path> = [ <-[ # ]>+ ] \s* [ '#' \s* $<comment> = [ .* ] ]?  $/) ?? (~$<key> => { value => (~$<path>).trim, comment => ($<comment> ?? ~$<comment> !! Str), }) !! { my ($key, $value) = $_.split(rx/ \s*  '=>' \s* /, 2); my $r = $key => $value; $r } };
-my $tmp = PathsFile.parse(@lines.grep({ !rx/^ [ \s* '#' .* || \s* ] $/ }).join("\n"), actions  => PathFileActions.new).made;
-dd $tmp;
+sub valid-key(Str:D $key --> Bool) is export {
+    my $actions = KeyActions;
+    my Str $match = KeyValid.parse($key, :rule('key'), :enc('UTF-8'), :$actions).made;
+    without $match {
+        return False;
+    }
+    return $key eq $match;
+}
+
+my Str  @lines     = slurp("$config/paths.p_th").split("\n").grep({ !rx/^ \h* '#' .* $/ }).grep({ !rx/^ \h* $/ });
+#my Str  %the-paths = @lines.map( { my Str $e = $_; $e ~~ s/ '#' .* $$ //; $e } ).map( { $_.trim() } ).grep({ !rx/ [ ^^ \s* '#' .* $$ || ^^ \s* $$ ] / }).map: { my ($key, $value) = $_.split(rx/ \s*  '=>' \s* /, 2); my $e = $key => $value; $e };
+#my Hash %the-lot   = @lines.grep({ !rx/ [ ^^ \s* '#' .* $$ || ^^ \s* $$ ] / }).map: { my $e = $_; ($e ~~ rx/^ \s* $<key> = [ \w+ [ [ '.' || '-' || '@' || '+' ]+ \w* ]* ] \s* '=>' \s* $<path> = [ <-[ # ]>+ ] \s* [ '#' \s* $<comment> = [ .* ] ]?  $/) ?? (~$<key> => { value => (~$<path>).trim, comment => ($<comment> ?? ~$<comment> !! Str), }) !! { my ($key, $value) = $_.split(rx/ \s*  '=>' \s* /, 2); my $r = $key => $value; $r } };
+my $actions = PathFileActions;
+my Hash %the-lot = PathsFile.parse(@lines.join("\n"), :enc('UTF-8'), :$actions).made;
 #my Hash %the-lot   = PathsFile.parse(@lines.join("\n"), actions  => PathFileActions.new).made;
 
 # the editor to use #
@@ -289,7 +290,7 @@ sub resolve-dir(Str $dir, Bool $relative-to-home = True) returns Str is export {
                 if $candidate {
                     $Dir ~~ s! ^^ $start \/ !$candidate\/!;
                 } else {
-                    "cannot resolve $start".say;
+                    $*ERR.say: "cannot resolve $start";
                     return $dir;
                 }
             }
@@ -300,11 +301,39 @@ sub resolve-dir(Str $dir, Bool $relative-to-home = True) returns Str is export {
     return $Dir;
 }
 
+sub resolve-alias(Str:D $key --> Str:D) {
+    my Str:D $KEY    = $key;
+    my %val          = %the-lot{$KEY};
+    my Str:D $return = %val«value»;
+    my Str:D $type   = %val«type»;
+    while $type eq 'alias' {
+        $KEY         = $return;
+        unless %the-lot{$KEY}:exists {
+            $*ERR.say: "could not resolve $key dangling alias";
+            return '';
+        }
+        %val         = %the-lot{$KEY};
+        $return      = %val«value»;
+        $type        = %val«type»;
+    }
+    unless $type eq 'dir' {
+        $*ERR.say: "could not resolve $key dangling alias did not resolve to a valid dir entry.";
+        $return = '';
+    }
+    return $return;
+} # sub resolve-alias(Str:D $key --> Str:D) #
+
 sub path(Str:D $go-here --> Str:D) is export {
-    my Str $return = '';
-    if %the-paths{$go-here}:exists {
-        $return = %the-paths{$go-here};
-        $return = resolve-dir($return);
+    my Str:D $return = '';
+    if %the-lot{$go-here}:exists {
+        my %val        = %the-lot{$go-here};
+        $return        = %val«value»;
+        my Str:D $type = %val«type»;
+        if $type eq 'alias' {
+            $return = resolve-alias($return);
+        } else {
+            $return = resolve-dir($return);
+        }
     }
     return $return;
 }
@@ -337,7 +366,7 @@ sub edit-configs() returns Bool:D is export {
 
 sub list-keys(Str $prefix = '' --> Array[Str]) is export {
     my Str @keys;
-    for %the-paths.keys -> $key {
+    for %the-lot.keys -> $key {
         if $key.starts-with($prefix, :ignorecase) {
             @keys.push($key);
         }
@@ -390,7 +419,7 @@ sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length 
     for %the-lot.kv -> $key, %val {
         if $key.starts-with($prefix, :ignorecase) {
             my Str $value      = %val«value»;
-            my Str $comment    = %val«comment»;
+            my Str $comment    = %val«comment» // Str;
             $value             = resolve-dir($value) if $resolve;
             $key-width         = max($key-width,     wcswidth($key));
             $value-width       = max($value-width,   wcswidth($value));
@@ -405,39 +434,44 @@ sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length 
     my Bool:D $comment-present = False;
     for %the-lot.kv -> $key, %val {
         if $key.starts-with($prefix, :ignorecase) {
-            my Str $value   = %val«value»;
-            my Str $comment = %val«comment»;
-            $value = resolve-dir($value) if $resolve;
+            my Str:D $value     = %val«value»;
+            my Str   $comment   = %val«comment» // Str;
+            my Str:D $type      = %val«type»;
+            my Str:D $type-spec = '-->';
+            if $type eq 'dir' {
+                $value = resolve-dir($value) if $resolve;
+                $type-spec = ' =>';
+            }
             with $comment {
-                @result.push(sprintf("%-*s => %-*s # %-*s", $key-width, $key, $value-width, $value, $comment-width, $comment));
+                @result.push(sprintf("%-*s %s %-*s # %-*s", $key-width, $key, $type-spec, $value-width, $value, $comment-width, $comment));
                 $comment-present = True;
             } else {
-                @result.push(sprintf("%-*s => %-*s", $key-width, $key, $value-width, $value));
+                @result.push(sprintf("%-*s %s %-*s", $key-width, $key, $type-spec, $value-width, $value));
             }
         }
     } # for %the-lot.kv -> $key, %val #
-    my Int:D $width = $key-width + $value-width + $comment-width + 7;
+    my Int:D $width = $key-width + $value-width + $comment-width + 8;
     my Int:D $cnt = 0;
     if $colour {
         with $comment-present {
-            put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s => %-*s # %-*s", $key-width, 'key', $value-width, 'value', $comment-width, 'comment') ~ t.text-reset;
+            put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s  => %-*s # %-*s", $key-width, 'key', $value-width, 'value', $comment-width, 'comment') ~ t.text-reset;
             $cnt++;
             put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
             $cnt++;
         } else {
-            put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s => %-*s", $key-width, 'key', $value-width, 'value') ~ t.text-reset;
+            put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s  => %-*s", $key-width, 'key', $value-width, 'value') ~ t.text-reset;
             $cnt++;
             put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
             $cnt++;
         }
     } else {
         with $comment-present {
-            printf("%-*s => %-*s # %-*s\n", $key-width, 'key', $value-width, 'value', $comment-width, 'comment');
+            printf("%-*s  => %-*s # %-*s\n", $key-width, 'key', $value-width, 'value', $comment-width, 'comment');
             $cnt++;
             say '=' x $width;
             $cnt++;
         } else {
-            printf("%-*s => %-*s\n", $key-width, 'key', $value-width, 'value');
+            printf("%-*s  => %-*s\n", $key-width, 'key', $value-width, 'value');
             $cnt++;
             say '=' x $width;
             $cnt++;
@@ -451,14 +485,14 @@ sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length 
                 with $comment-present {
                     put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
                     $cnt++;
-                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s => %-*s # %-*s", $key-width, 'key', $value-width, 'value', $comment-width, 'comment') ~ t.text-reset;
+                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s  => %-*s # %-*s", $key-width, 'key', $value-width, 'value', $comment-width, 'comment') ~ t.text-reset;
                     $cnt++;
                     put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
                     $cnt++;
                 } else {
                     put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
                     $cnt++;
-                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s => %-*s", $key-width, 'key', $value-width, 'value') ~ t.text-reset;
+                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s  => %-*s", $key-width, 'key', $value-width, 'value') ~ t.text-reset;
                     $cnt++;
                     put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
                     $cnt++;
@@ -471,14 +505,14 @@ sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length 
                 with $comment-present {
                     say '=' x $width;
                     $cnt++;
-                    printf("%-*s => %-*s # %-*s\n", $key-width, 'key', $value-width, 'value', $comment-width, 'comment');
+                    printf("%-*s  => %-*s # %-*s\n", $key-width, 'key', $value-width, 'value', $comment-width, 'comment');
                     $cnt++;
                     say '=' x $width;
                     $cnt++;
                 } else {
                     say '=' x $width;
                     $cnt++;
-                    printf("%-*s => %-*s\n", $key-width, 'key', $value-width, 'value');
+                    printf("%-*s  => %-*s\n", $key-width, 'key', $value-width, 'value');
                     $cnt++;
                     say '=' x $width;
                     $cnt++;
@@ -497,6 +531,7 @@ sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length 
 
 sub add-tildes(Str:D $path is copy --> Str:D) {
     $path .=trim;
+    $path  = $path.IO.absolute;
     $path  = '~' if $path eq $home;
     $path ~~ s{^ $home '/' } = '~/';
     $path ~~ s{^ '/home/' }  = '~';
@@ -505,7 +540,11 @@ sub add-tildes(Str:D $path is copy --> Str:D) {
 }
 
 sub add-path(Str:D $key, Str:D $path, Bool $force, Str $comment --> Bool) is export {
-    if %the-paths{$key}:exists {
+    unless valid-key($key) {
+        $*ERR.say: "invalid key: $key";
+        return False;
+    }
+    if %the-lot{$key}:exists {
         if $force {
             CATCH {
                 when X::IO::Rename {
@@ -517,7 +556,7 @@ sub add-path(Str:D $key, Str:D $path, Bool $force, Str $comment --> Bool) is exp
                     return False;
                 }
             }
-            my Str $line = sprintf "%-20s => %-50s", $key, add-tildes($path);
+            my Str $line = sprintf "%-20s  => %-50s", $key, add-tildes($path);
             with $comment {
                 $line ~= " # $comment";
             }
@@ -525,7 +564,7 @@ sub add-path(Str:D $key, Str:D $path, Bool $force, Str $comment --> Bool) is exp
             my IO::Handle:D $output = "$config/paths.p_th.new".IO.open: :w, :nl-out("\n"), :chomp(True);
             my Str $ln;
             while $ln = $input.get {
-                if $ln ~~ rx/^ \s* <$key> \s* '=>' \s* .* $/ {
+                if $ln ~~ rx/^ \s* <$key> \s* [ '-->' || '=>' ] \s* .* $/ {
                     $output.say: $line;
                 } else {
                     $output.say: $ln
@@ -544,7 +583,7 @@ sub add-path(Str:D $key, Str:D $path, Bool $force, Str $comment --> Bool) is exp
         }
     }
     my Str $config-path = "$config/paths.p_th";
-    my Str $line = sprintf "%-20s => %-50s", $key, add-tildes($path);
+    my Str $line = sprintf "%-20s  => %-50s", $key, add-tildes($path);
     with $comment {
         $line ~= " # $comment";
     }
@@ -617,19 +656,89 @@ sub tidy-file( --> Bool) is export {
     }
 } # sub tidy-file( --> Bool) is export #
 
-sub add-alias(Str:D $key, Str:D $target, Bool:D $force, Str $comment is copy --> Bool) is export {
-    if %the-paths{$target}:!exists {
+sub add-alias(Str:D $key, Str:D $target, Bool:D $force is copy, Bool:D $overwrite-dirs, Str $comment is copy --> Bool) is export {
+    unless valid-key($key) {
+        $*ERR.say: "invalid key: $key";
+        return False;
+    }
+    if $key eq $target {
+        $*ERR.say: "Error key equals target";
+        return False;
+    }
+    if %the-lot{$target}:exists {
+        my %val = %the-lot{$target};
+        without $comment {
+            with %val«comment» {
+                $comment = %val«comment»;
+            }
+        }
+        $force = True if $overwrite-dirs;
+        if %the-lot{$key}:exists {
+            if $force {
+                CATCH {
+                    when X::IO::Rename {
+                        $*ERR.say: $_;
+                        return False;
+                    }
+                    default: {
+                        $*ERR.say: $_;
+                        return False;
+                    }
+                }
+                my %kval = %the-lot{$key};
+                unless %kval«type» eq 'alias' || $overwrite-dirs {
+                    "$key is not an alias it's a {%kval«type»} use -d|--really-force|--overwrite-dirs to override".say;
+                    return False;
+                }
+                without $comment {
+                    with %kval«comment» {
+                        $comment = %kval«comment»;
+                    }
+                }
+                my Str $line = sprintf "%-20s --> %-50s", $key, $target;
+                with $comment {
+                    $line ~= " # $comment";
+                }
+                my IO::Handle:D $input  = "$config/paths.p_th".IO.open:     :r, :nl-in("\n")   :chomp;
+                my IO::Handle:D $output = "$config/paths.p_th.new".IO.open: :w, :nl-out("\n"), :chomp(True);
+                my Str $ln;
+                while $ln = $input.get {
+                    if $ln ~~ rx/^ \s* <$key> \s* $<type> = [ '-->' | '=>' ] \s* .* $/ {
+                        if ~$<type> eq 'alias' || $overwrite-dirs {
+                            $output.say: $line;
+                        } else {
+                            $output.say: $ln
+                        }
+                    } else {
+                        $output.say: $ln
+                    }
+                }
+                $input.close;
+                $output.close;
+                if "$config/paths.p_th.new".IO.move: "$config/paths.p_th" {
+                    return True;
+                } else {
+                    return False;
+                }
+            } else {
+                $*ERR.say: "duplicate key use -s|--set|--force to override";
+                return False;
+            }
+        } else {
+            my Str $config-path = "$config/paths.p_th";
+            my Str $line = sprintf "%-20s --> %-50s", $key, $target;
+            with $comment {
+                $line ~= " # $comment";
+            }
+            $line ~= "\n";
+            $config-path.IO.spurt($line, :append);
+            return True;
+        }
+    } else {
         "target: $target doesnot exist".say;
         return False;
     }
-    without $comment {
-        my Str %val = %the-lot{$target};
-        with %val«comment» {
-            $comment = %val«comment»;
-        }
-    }
-    return add-path($key, %the-paths{$target}, $force, $comment);
-}
+} # sub add-alias(Str:D $key, Str:D $target, Bool:D $force is copy, Bool:D $overwrite-dirs, Str $comment is copy --> Bool) is export #
 
 sub add-comment(Str:D $key, Str:D $comment --> Bool) is export {
     CATCH {
@@ -646,8 +755,8 @@ sub add-comment(Str:D $key, Str:D $comment --> Bool) is export {
     my IO::Handle:D $output = "$config/paths.p_th.new".IO.open: :w, :nl-out("\n"), :chomp(True);
     my Str $ln;
     while $ln = $input.get {
-        if $ln ~~ rx/^ \s* $<key> = [ \w+ [ [ '.' || '-' || '@' || '+' ]+ \w* ]* ] \s* '=>' \s* $<path> = [ <-[ # ]>+ ] \s* [ '#' \s* $<comment> = [ .* ] ]?  $/ {
-            my Str $line = sprintf "%-20s => %-50s", ~$<key>, add-tildes(~$<path>);
+        if $ln ~~ rx/^ \s* $<key> = [ \w+ [ [ '.' || '-' || '@' || '+' ]+ \w* ]* ] \s* $<type> = [ [ '--' || '=' ] '>' ] \s* $<path> = [ <-[ # ]>+ ] \s* [ '#' \s* $<comment> = [ .* ] ]?  $/ {
+            my Str $line = sprintf "%-20s %s %-50s", ~$<key>, ~$<type>, add-tildes(~$<path>);
             if $key eq ~$<key> {
                 $line ~= " # $comment" unless $comment.trim eq '';
             } orwith $<comment> {
