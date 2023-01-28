@@ -33,7 +33,6 @@ function goto(){
               eb
           else
              arg=$(paths.raku "$1")
-             echo "\$arg == \`$arg'"
              if [ -z "$arg" ]
              then
                  echo "error: $1 not found"

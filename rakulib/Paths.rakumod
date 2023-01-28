@@ -603,11 +603,15 @@ sub delete-key(Str:D $key, Bool:D $comment-out --> Bool) is export {
             return False;
         }
     }
+    unless valid-key($key) {
+        $*ERR.say: "invalid key: $key";
+        return False;
+    }
     my IO::Handle:D $input  = "$config/paths.p_th".IO.open:     :r, :nl-in("\n")   :chomp;
     my IO::Handle:D $output = "$config/paths.p_th.new".IO.open: :w, :nl-out("\n"), :chomp(True);
     my Str $ln;
     while $ln = $input.get {
-        if $ln ~~ rx/^ \s* <$key> \s* '=>' \s* .* $/ {
+        if $ln ~~ rx/^ \s* <$key> \s* [ '-->' || ' =>' ] \s* .* $/ {
             $output.say: "# $ln" if $comment-out;
         } else {
             $output.say: $ln
@@ -637,8 +641,13 @@ sub tidy-file( --> Bool) is export {
     my IO::Handle:D $output = "$config/paths.p_th.new".IO.open: :w, :nl-out("\n"), :chomp(True);
     my Str $ln;
     while $ln = $input.get {
-        if $ln ~~ rx/^ \s* $<key> = [ \w+ [ [ '.' || '-' || '@' || '+' ]+ \w* ]* ] \s* '=>' \s* $<path> = [ <-[ # ]>+ ] \s* [ '#' \s* $<comment> = [ .* ] ]?  $/ {
-            my Str $line = sprintf "%-20s => %-50s", ~$<key>, add-tildes(~$<path>);
+        if $ln ~~ rx/^ \s* $<key> = [ \w* [ <-[\h]>+ \w* ]* ] \s* $<type> = [ '-->' || ' =>' ] \s* $<path> = [ <-[ # ]>+ ] \s* [ '#' \s* $<comment> = [ .* ] ]?  $/ {
+            my Str:D $path = ~$<path>;
+            $path         .=trim;
+            if ~$<type> eq 'dir' {
+                $path = add-tildes($path);
+            }
+            my Str $line = sprintf "%-20s %s %-50s", ~$<key>, ~$<type>, $path;
             with $<comment> {
                 $line ~= " # $<comment>";
             }
@@ -703,7 +712,7 @@ sub add-alias(Str:D $key, Str:D $target, Bool:D $force is copy, Bool:D $overwrit
                 my IO::Handle:D $output = "$config/paths.p_th.new".IO.open: :w, :nl-out("\n"), :chomp(True);
                 my Str $ln;
                 while $ln = $input.get {
-                    if $ln ~~ rx/^ \s* <$key> \s* $<type> = [ '-->' | '=>' ] \s* .* $/ {
+                    if $ln ~~ rx/^ \s* $key \s* $<type> = [ '-->' | '=>' ] \s* .* $/ {
                         if ~$<type> eq 'alias' || $overwrite-dirs {
                             $output.say: $line;
                         } else {
@@ -755,8 +764,10 @@ sub add-comment(Str:D $key, Str:D $comment --> Bool) is export {
     my IO::Handle:D $output = "$config/paths.p_th.new".IO.open: :w, :nl-out("\n"), :chomp(True);
     my Str $ln;
     while $ln = $input.get {
-        if $ln ~~ rx/^ \s* $<key> = [ \w+ [ [ '.' || '-' || '@' || '+' ]+ \w* ]* ] \s* $<type> = [ [ '--' || '=' ] '>' ] \s* $<path> = [ <-[ # ]>+ ] \s* [ '#' \s* $<comment> = [ .* ] ]?  $/ {
-            my Str $line = sprintf "%-20s %s %-50s", ~$<key>, ~$<type>, add-tildes(~$<path>);
+        if $ln ~~ rx/^ \s* $<key> = [ \w+ [ [ '.' || '-' || '@' || '+' ]+ \w* ]* ] \s* $<type> = [ '-->' || ' =>' ] \s* $<path> = [ <-[ # ]>+ ] \s* [ '#' \s* $<comment> = [ .* ] ]?  $/ {
+            my Str:D $path = ~$<path>;
+            $path         .=trim;
+            my Str $line = sprintf "%-20s %s %-50s", ~$<key>, ~$<type>, add-tildes($path);
             if $key eq ~$<key> {
                 $line ~= " # $comment" unless $comment.trim eq '';
             } orwith $<comment> {
