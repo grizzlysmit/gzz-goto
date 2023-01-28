@@ -41,7 +41,6 @@ function goto(){
                  cd "$arg"
                  # shellcheck disable=SC2119
                  eb
-                 echo "\$arg == \`$arg'"
              fi
           fi;;
       *) paths.raku "$@";;

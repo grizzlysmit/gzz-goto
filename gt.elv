@@ -23,7 +23,6 @@ fn goto {| @_args |
              if (==s $res '') {
                 echo "error: "$_args[0]" not found"
              } else {
-                echo "\$res == `"$res"'"
                 dir:cd $res
                 e:exa -FlaahigHb  --colour-scale --time-style=full-iso
              }
