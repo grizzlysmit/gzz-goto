@@ -1,5 +1,6 @@
 #!/usr/bin/env raku
 use v6;
+use ECMA262Regex;
 
 my %*SUB-MAIN-OPTS;
 %*SUB-MAIN-OPTS«named-anywhere» = True;
@@ -20,12 +21,12 @@ multi sub MAIN('edit', 'configs') returns Int {
    } 
 }
 
-multi sub MAIN('list', 'keys', Str $prefix = '', Str :p(:$pattern) = Str, Str :e(:$emca-pattern) = Str) returns Int {
+multi sub MAIN('list', 'keys', Str $prefix = '', Str :p(:$pattern) = Str, Str :e(:$ecma-pattern) = Str) returns Int {
     my Regex $_pattern;
     with $pattern {
         $_pattern = rx:i/ <$pattern> /;
-    } orwith $emca-pattern {
-        $_pattern = ECMA262Regex.compile("^$emca-pattern\$");
+    } orwith $ecma-pattern {
+        $_pattern = ECMA262Regex.compile("^$ecma-pattern\$");
     } else {
         $_pattern = rx:i/^ .* $/;
     }
@@ -36,12 +37,12 @@ multi sub MAIN('list', 'keys', Str $prefix = '', Str :p(:$pattern) = Str, Str :e
     } 
 }
 
-multi sub MAIN('list', 'all', Str:D $prefix = '', Bool:D :r(:$resolve) = False, Bool:D :c(:color(:$colour)) = False, Int:D :p(:$page-length) = 50, Str :p(:$pattern) = Str, Str :e(:$emca-pattern) = Str) returns Int {
+multi sub MAIN('list', 'all', Str:D $prefix = '', Bool:D :r(:$resolve) = False, Bool:D :c(:color(:$colour)) = False, Int:D :l(:$page-length) = 50, Str :p(:$pattern) = Str, Str :e(:$ecma-pattern) = Str) returns Int {
     my Regex $_pattern;
     with $pattern {
         $_pattern = rx:i/ <$pattern> /;
-    } orwith $emca-pattern {
-        $_pattern = ECMA262Regex.compile("^$emca-pattern\$");
+    } orwith $ecma-pattern {
+        $_pattern = ECMA262Regex.compile("^$ecma-pattern\$");
     } else {
         $_pattern = rx:i/^ .* $/;
     }
@@ -50,7 +51,7 @@ multi sub MAIN('list', 'all', Str:D $prefix = '', Bool:D :r(:$resolve) = False, 
     } else {
        exit 1;
     } 
-} # multi sub MAIN('list', 'all', Str $prefix = '', Bool:D :r(:$resolve) = False, Bool:D :c(:color(:$colour)) = False, Str :p(:$pattern) = Str, Str :e(:$emca-pattern) = Str) returns Int #
+} # multi sub MAIN('list', 'all', Str $prefix = '', Bool:D :r(:$resolve) = False, Bool:D :c(:color(:$colour)) = False, Str :p(:$pattern) = Str, Str :e(:$ecma-pattern) = Str) returns Int #
 
 multi sub MAIN('add', Str:D $key, Str:D $path, Bool:D :s(:set(:$force)) = False, Str :c(:$comment) = Str) returns Int {
    if add-path($key, $path, $force, $comment) {
