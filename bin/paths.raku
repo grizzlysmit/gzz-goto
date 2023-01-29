@@ -21,7 +21,7 @@ multi sub MAIN('edit', 'configs') returns Int {
    } 
 }
 
-multi sub MAIN('list', 'keys', Str $prefix = '', Str :p(:$pattern) = Str, Str :e(:$ecma-pattern) = Str) returns Int {
+multi sub MAIN('list', 'keys', Str $prefix = '', Bool:D :c(:color(:$colour)) = False, Int:D :l(:$page-length) = 50, Str :p(:$pattern) = Str, Str :e(:$ecma-pattern) = Str) returns Int {
     my Regex $_pattern;
     with $pattern {
         $_pattern = rx:i/ <$pattern> /;
@@ -30,7 +30,7 @@ multi sub MAIN('list', 'keys', Str $prefix = '', Str :p(:$pattern) = Str, Str :e
     } else {
         $_pattern = rx:i/^ .* $/;
     }
-    if say-list-keys($prefix, $_pattern) {
+    if say-list-keys($prefix, $colour, $_pattern, $page-length) {
        exit 0;
     } else {
        exit 1;
