@@ -53,6 +53,38 @@ multi sub MAIN('list', 'all', Str:D $prefix = '', Bool:D :r(:$resolve) = False, 
     } 
 } # multi sub MAIN('list', 'all', Str $prefix = '', Bool:D :r(:$resolve) = False, Bool:D :c(:color(:$colour)) = False, Str :p(:$pattern) = Str, Str :e(:$ecma-pattern) = Str) returns Int #
 
+multi sub MAIN('list', 'paths', Str:D $prefix = '', Bool:D :r(:$resolve) = False, Bool:D :c(:color(:$colour)) = False, Int:D :l(:$page-length) = 50, Str :p(:$pattern) = Str, Str :e(:$ecma-pattern) = Str) returns Int {
+    my Regex $_pattern;
+    with $pattern {
+        $_pattern = rx:i/ <$pattern> /;
+    } orwith $ecma-pattern {
+        $_pattern = ECMA262Regex.compile("^$ecma-pattern\$");
+    } else {
+        $_pattern = rx:i/^ .* $/;
+    }
+    if list-paths($prefix, $resolve, $colour, $page-length, $_pattern) {
+       exit 0;
+    } else {
+       exit 1;
+    } 
+} # multi sub MAIN('list', 'all', Str $prefix = '', Bool:D :r(:$resolve) = False, Bool:D :c(:color(:$colour)) = False, Str :p(:$pattern) = Str, Str :e(:$ecma-pattern) = Str) returns Int #
+
+multi sub MAIN('list', 'by', 'both', Str:D $prefix = '', Bool:D :r(:$resolve) = False, Bool:D :c(:color(:$colour)) = False, Int:D :l(:$page-length) = 50, Str :p(:$pattern) = Str, Str :e(:$ecma-pattern) = Str) returns Int {
+    my Regex $_pattern;
+    with $pattern {
+        $_pattern = rx:i/ <$pattern> /;
+    } orwith $ecma-pattern {
+        $_pattern = ECMA262Regex.compile("^$ecma-pattern\$");
+    } else {
+        $_pattern = rx:i/^ .* $/;
+    }
+    if list-by-both($prefix, $resolve, $colour, $page-length, $_pattern) {
+       exit 0;
+    } else {
+       exit 1;
+    } 
+} # multi sub MAIN('list', 'all', Str $prefix = '', Bool:D :r(:$resolve) = False, Bool:D :c(:color(:$colour)) = False, Str :p(:$pattern) = Str, Str :e(:$ecma-pattern) = Str) returns Int #
+
 multi sub MAIN('add', Str:D $key, Str:D $path, Bool:D :s(:set(:$force)) = False, Str :c(:$comment) = Str) returns Int {
    if add-path($key, $path, $force, $comment) {
        exit 0;

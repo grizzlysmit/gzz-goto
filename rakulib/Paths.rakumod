@@ -643,6 +643,266 @@ sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length,
     return True;
 } # sub list-all(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length, Regex:D $pattern --> Bool:D) is export #
 
+sub list-paths(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length, Regex:D $pattern --> Bool:D) is export {
+    my Str @result;
+    my Int:D $key-width        = 0;
+    my Int:D $value-width      = 0;
+    my Int:D $comment-width    = 0;
+    for %the-lot.kv -> $key, %val {
+        my Str $value      = %val«value»;
+        without $value {
+            next;
+        }
+        if $value.trim eq '' {
+            next;
+        }
+        if $value.starts-with("~/$prefix", :ignorecase) && $value ~~ $pattern {
+            my Str $comment    = %val«comment» // Str;
+            $value             = resolve-dir($value) if $resolve;
+            $key-width         = max($key-width,     wcswidth($key));
+            $value-width       = max($value-width,   wcswidth($value));
+            with $comment {
+                $comment-width = max($comment-width, wcswidth($comment));
+            }
+        }
+    } # for %the-lot.kv -> $key, %val #
+    $key-width     += 2;
+    $value-width   += 2;
+    $comment-width += 2;
+    my Bool:D $comment-present = False;
+    for %the-lot.kv -> $key, %val {
+        my Str:D $value     = %val«value»;
+        without $value {
+            next;
+        }
+        if $value.trim eq '' {
+            next;
+        }
+        if $value.starts-with("~/$prefix", :ignorecase) && $value ~~ $pattern {
+            my Str   $comment   = %val«comment» // Str;
+            my Str:D $type      = %val«type»;
+            my Str:D $type-spec = '-->';
+            if $type eq 'dir' {
+                $value = resolve-dir($value) if $resolve;
+                $type-spec = ' =>';
+            }
+            with $comment {
+                @result.push(sprintf("%-*s %s %-*s # %-*s", $key-width, $key, $type-spec, $value-width, $value, $comment-width, $comment));
+                $comment-present = True;
+            } else {
+                @result.push(sprintf("%-*s %s %-*s", $key-width, $key, $type-spec, $value-width, $value));
+            }
+        }
+    } # for %the-lot.kv -> $key, %val #
+    my Int:D $width = $key-width + $value-width + $comment-width + 8;
+    my Int:D $cnt = 0;
+    if $colour {
+        if $comment-present {
+            put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s  => %-*s # %-*s", $key-width, 'key', $value-width, 'value', $comment-width, 'comment') ~ t.text-reset;
+            $cnt++;
+            put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
+            $cnt++;
+        } else {
+            put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s  => %-*s", $key-width, 'key', $value-width, 'value') ~ t.text-reset;
+            $cnt++;
+            put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
+            $cnt++;
+        }
+    } else {
+        if $comment-present {
+            printf("%-*s  => %-*s # %-*s\n", $key-width, 'key', $value-width, 'value', $comment-width, 'comment');
+            $cnt++;
+            say '=' x $width;
+            $cnt++;
+        } else {
+            printf("%-*s  => %-*s\n", $key-width, 'key', $value-width, 'value');
+            $cnt++;
+            say '=' x $width;
+            $cnt++;
+        }
+    }
+    for @result.sort( { .lc } ) -> $value {
+        if $colour {
+            put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, $value) ~ t.text-reset;
+            $cnt++;
+            if $cnt % $page-length == 0 {
+                if $comment-present {
+                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
+                    $cnt++;
+                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s  => %-*s # %-*s", $key-width, 'key', $value-width, 'value', $comment-width, 'comment') ~ t.text-reset;
+                    $cnt++;
+                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
+                    $cnt++;
+                } else {
+                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
+                    $cnt++;
+                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s  => %-*s", $key-width, 'key', $value-width, 'value') ~ t.text-reset;
+                    $cnt++;
+                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
+                    $cnt++;
+                }
+            } # if $cnt % $page-length == 0 #
+        } else { # if $colour #
+            $value.say;
+            $cnt++;
+            if $cnt % $page-length == 0 {
+                if $comment-present {
+                    say '=' x $width;
+                    $cnt++;
+                    printf("%-*s  => %-*s # %-*s\n", $key-width, 'key', $value-width, 'value', $comment-width, 'comment');
+                    $cnt++;
+                    say '=' x $width;
+                    $cnt++;
+                } else {
+                    say '=' x $width;
+                    $cnt++;
+                    printf("%-*s  => %-*s\n", $key-width, 'key', $value-width, 'value');
+                    $cnt++;
+                    say '=' x $width;
+                    $cnt++;
+                }
+            } # if $cnt % $page-length == 0 #
+        } # if $colour ... else ... #
+    } # for @result.sort( { .lc } ) -> $value #
+    if $colour {
+        put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, '') ~ t.text-reset;
+        $cnt++;
+    } else {
+        "".say;
+    }
+    return True;
+} # sub list-paths(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length, Regex:D $pattern --> Bool:D) is export #
+
+sub list-by-both(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length, Regex:D $pattern --> Bool:D) is export {
+    my Str @result;
+    my Int:D $key-width        = 0;
+    my Int:D $value-width      = 0;
+    my Int:D $comment-width    = 0;
+    for %the-lot.kv -> $key, %val {
+        my Str $value      = %val«value»;
+        without $value {
+            next;
+        }
+        if $value.trim eq '' {
+            next;
+        }
+        if ($key.starts-with($prefix, :ignorecase) && $key ~~ $pattern) || ($value.starts-with("~/$prefix", :ignorecase) && $value ~~ $pattern) {
+            my Str $comment    = %val«comment» // Str;
+            $value             = resolve-dir($value) if $resolve;
+            $key-width         = max($key-width,     wcswidth($key));
+            $value-width       = max($value-width,   wcswidth($value));
+            with $comment {
+                $comment-width = max($comment-width, wcswidth($comment));
+            }
+        }
+    } # for %the-lot.kv -> $key, %val #
+    $key-width     += 2;
+    $value-width   += 2;
+    $comment-width += 2;
+    my Bool:D $comment-present = False;
+    for %the-lot.kv -> $key, %val {
+        my Str:D $value     = %val«value»;
+        without $value {
+            next;
+        }
+        if $value.trim eq '' {
+            next;
+        }
+        if ($key.starts-with($prefix, :ignorecase) && $key ~~ $pattern) || ($value.starts-with("~/$prefix", :ignorecase) && $value ~~ $pattern) {
+            my Str   $comment   = %val«comment» // Str;
+            my Str:D $type      = %val«type»;
+            my Str:D $type-spec = '-->';
+            if $type eq 'dir' {
+                $value = resolve-dir($value) if $resolve;
+                $type-spec = ' =>';
+            }
+            with $comment {
+                @result.push(sprintf("%-*s %s %-*s # %-*s", $key-width, $key, $type-spec, $value-width, $value, $comment-width, $comment));
+                $comment-present = True;
+            } else {
+                @result.push(sprintf("%-*s %s %-*s", $key-width, $key, $type-spec, $value-width, $value));
+            }
+        }
+    } # for %the-lot.kv -> $key, %val #
+    my Int:D $width = $key-width + $value-width + $comment-width + 8;
+    my Int:D $cnt = 0;
+    if $colour {
+        if $comment-present {
+            put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s  => %-*s # %-*s", $key-width, 'key', $value-width, 'value', $comment-width, 'comment') ~ t.text-reset;
+            $cnt++;
+            put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
+            $cnt++;
+        } else {
+            put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s  => %-*s", $key-width, 'key', $value-width, 'value') ~ t.text-reset;
+            $cnt++;
+            put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
+            $cnt++;
+        }
+    } else {
+        if $comment-present {
+            printf("%-*s  => %-*s # %-*s\n", $key-width, 'key', $value-width, 'value', $comment-width, 'comment');
+            $cnt++;
+            say '=' x $width;
+            $cnt++;
+        } else {
+            printf("%-*s  => %-*s\n", $key-width, 'key', $value-width, 'value');
+            $cnt++;
+            say '=' x $width;
+            $cnt++;
+        }
+    }
+    for @result.sort( { .lc } ) -> $value {
+        if $colour {
+            put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, $value) ~ t.text-reset;
+            $cnt++;
+            if $cnt % $page-length == 0 {
+                if $comment-present {
+                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
+                    $cnt++;
+                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s  => %-*s # %-*s", $key-width, 'key', $value-width, 'value', $comment-width, 'comment') ~ t.text-reset;
+                    $cnt++;
+                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
+                    $cnt++;
+                } else {
+                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
+                    $cnt++;
+                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s  => %-*s", $key-width, 'key', $value-width, 'value') ~ t.text-reset;
+                    $cnt++;
+                    put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, centre('', $width, '=')) ~ t.text-reset;
+                    $cnt++;
+                }
+            } # if $cnt % $page-length == 0 #
+        } else { # if $colour #
+            $value.say;
+            $cnt++;
+            if $cnt % $page-length == 0 {
+                if $comment-present {
+                    say '=' x $width;
+                    $cnt++;
+                    printf("%-*s  => %-*s # %-*s\n", $key-width, 'key', $value-width, 'value', $comment-width, 'comment');
+                    $cnt++;
+                    say '=' x $width;
+                    $cnt++;
+                } else {
+                    say '=' x $width;
+                    $cnt++;
+                    printf("%-*s  => %-*s\n", $key-width, 'key', $value-width, 'value');
+                    $cnt++;
+                    say '=' x $width;
+                    $cnt++;
+                }
+            } # if $cnt % $page-length == 0 #
+        } # if $colour ... else ... #
+    } # for @result.sort( { .lc } ) -> $value #
+    if $colour {
+        put (($cnt % 2 == 0) ?? t.bg-yellow !! t.bg-color(0,255,0)) ~ t.bold ~ t.bright-blue ~ sprintf("%-*s", $width, '') ~ t.text-reset;
+        $cnt++;
+    } else {
+        "".say;
+    }
+    return True;
+} # sub list-by-both(Str:D $prefix, Bool:D $resolve, Bool:D $colour, Int:D $page-length, Regex:D $pattern --> Bool:D) is export #
+
 sub add-tildes(Str:D $path is copy --> Str:D) {
     $path .=trim;
     unless $path.starts-with('~') {
