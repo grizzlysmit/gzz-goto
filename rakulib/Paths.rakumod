@@ -20,6 +20,46 @@ my Str @guieditors;
 
 sub generate-configs(Str $file) returns Bool:D {
     my Bool $result = True;
+    CATCH {
+        default { 
+                $*ERR.say: .message; 
+                $*ERR.say: "some kind of IO exception was caught!"; 
+                my Str $content;
+                given $file {
+                    when 'paths.p_th' {
+                        $content = q:to/END/;
+                        #mappings #
+                        ex         =>  fred@example.com :  22     # example entry
+
+                        END
+                    }
+                    when 'editors' {
+                        $content = q:to/END/;
+                            # these editors are gui editors
+                            # you can define multiple lines like these 
+                            # and the system will add to an array of strings 
+                            # to treat as guieditors (+= is prefered but = can be used).  
+                            guieditors  +=  gvim
+                            guieditors  +=  xemacs
+                            guieditors  +=  gedit
+                            guieditors  +=  kate
+
+                        END
+                        for <gvim xemacs kate gedit> -> $guieditor {
+                            @guieditors.append($guieditor);
+                        }
+                        for @guieditors -> $guieditor {
+                            $content ~= "\n        guieditors  +=  $guieditor";
+                        }
+                    } # when 'editors' #
+                }
+                $content .=trim-trailing;
+                if "$config/$file".IO !~~ :e || "$config/$file".IO.s == 0 {
+                    "$config/$file".IO.spurt: $content, :append;
+                }
+                return True;
+           }
+    }
     my IO::CatHandle:D $fd = "$config/$file".IO.open: :w;
     given $file {
         when 'paths.p_th' {
@@ -65,7 +105,7 @@ sub generate-configs(Str $file) returns Bool:D {
 my Bool:D $please-edit = False;
 for @config-files -> $file {
     my Bool $result = True;
-    if "$config/paths.p_th".IO !~~ :f {
+    if "$config/paths.p_th".IO !~~ :e {
         $please-edit = True;
         if "/etc/skel/.local/share/paths/$file".IO ~~ :f {
             try {
@@ -91,7 +131,6 @@ for @config-files -> $file {
         }
     }
 } # for @config-files -> $file # 
-edit-configs() if $please-edit;
 
 grammar Key {
     regex key { \w* [ <-[\h]>+ \w* ]* }
@@ -105,7 +144,7 @@ role KeyActions {
 }
 
 grammar Paths {
-    token path         { [ <absolute-path> | <relative-path> ] }
+    token path         { [ <absolute-path> || <relative-path> ] }
     token absolute-path { [ '/' | '~' | '~/' ]  <path-segments>? }
     token relative-path { <path-segments> }
     regex path-segments { <path-segment> [ '/' <path-segment> ]* '/'? }
@@ -143,7 +182,7 @@ role PathsActions {
 
 grammar PathsFile is Key is Paths {
     token TOP           { <line> [ \v+ <line> ]* \v* }
-    token line          { [ <dir> | <alias> ] }
+    token line          { [ <dir> || <alias> ] }
     token dir           { <key> \h* '=>' \h* <path> \h* [ '#' \h* <comment> \h* ]? }
     token alias         { <key> \h* '-->' \h* <target=.key> \h* [ '#' \h* <comment> \h* ]? }
     token comment       { <-[\n]>* }
@@ -214,13 +253,6 @@ sub valid-key(Str:D $key --> Bool) is export {
     return $key eq $match;
 }
 
-my Str  @lines     = slurp("$config/paths.p_th").split("\n").grep({ !rx/^ \h* '#' .* $/ }).grep({ !rx/^ \h* $/ });
-#my Str  %the-paths = @lines.map( { my Str $e = $_; $e ~~ s/ '#' .* $$ //; $e } ).map( { $_.trim() } ).grep({ !rx/ [ ^^ \s* '#' .* $$ || ^^ \s* $$ ] / }).map: { my ($key, $value) = $_.split(rx/ \s*  '=>' \s* /, 2); my $e = $key => $value; $e };
-#my Hash %the-lot   = @lines.grep({ !rx/ [ ^^ \s* '#' .* $$ || ^^ \s* $$ ] / }).map: { my $e = $_; ($e ~~ rx/^ \s* $<key> = [ \w+ [ [ '.' || '-' || '@' || '+' ]+ \w* ]* ] \s* '=>' \s* $<path> = [ <-[ # ]>+ ] \s* [ '#' \s* $<comment> = [ .* ] ]?  $/) ?? (~$<key> => { value => (~$<path>).trim, comment => ($<comment> ?? ~$<comment> !! Str), }) !! { my ($key, $value) = $_.split(rx/ \s*  '=>' \s* /, 2); my $r = $key => $value; $r } };
-my $actions = PathFileActions;
-my Hash %the-lot = PathsFile.parse(@lines.join("\n"), :enc('UTF-8'), :$actions).made;
-#my Hash %the-lot   = PathsFile.parse(@lines.join("\n"), actions  => PathFileActions.new).made;
-
 # the editor to use #
 my Str $editor = '';
 if %*ENV<GUI_EDITOR>:exists {
@@ -241,6 +273,18 @@ if %*ENV<GUI_EDITOR>:exists {
         $editor = $vi;
     }
 }
+
+if $please-edit {
+    edit-configs();
+    exit 0;
+}
+
+my Str  @lines     = slurp("$config/paths.p_th").split("\n").grep({ !rx/^ \h* '#' .* $/ }).grep({ !rx/^ \h* $/ });
+#my Str  %the-paths = @lines.map( { my Str $e = $_; $e ~~ s/ '#' .* $$ //; $e } ).map( { $_.trim() } ).grep({ !rx/ [ ^^ \s* '#' .* $$ || ^^ \s* $$ ] / }).map: { my ($key, $value) = $_.split(rx/ \s*  '=>' \s* /, 2); my $e = $key => $value; $e };
+#my Hash %the-lot   = @lines.grep({ !rx/ [ ^^ \s* '#' .* $$ || ^^ \s* $$ ] / }).map: { my $e = $_; ($e ~~ rx/^ \s* $<key> = [ \w+ [ [ '.' || '-' || '@' || '+' ]+ \w* ]* ] \s* '=>' \s* $<path> = [ <-[ # ]>+ ] \s* [ '#' \s* $<comment> = [ .* ] ]?  $/) ?? (~$<key> => { value => (~$<path>).trim, comment => ($<comment> ?? ~$<comment> !! Str), }) !! { my ($key, $value) = $_.split(rx/ \s*  '=>' \s* /, 2); my $r = $key => $value; $r } };
+my $actions = PathFileActions;
+my Hash %the-lot = PathsFile.parse(@lines.join("\n"), :enc('UTF-8'), :$actions).made;
+#my Hash %the-lot   = PathsFile.parse(@lines.join("\n"), actions  => PathFileActions.new).made;
 
 # The default name of the gui editor #
 my Str @gui-editors = slurp("$config/editors").split("\n").map( { my Str $e = $_; $e ~~ s/ '#' .* $$ //; $e } ).map( { $_.trim() } ).grep: { !rx/ [ ^^ \s* '#' .* $$ || ^^ \s* $$ ] / };
@@ -943,7 +987,7 @@ sub add-path(Str:D $key, Str:D $path is copy, Bool $force, Str $comment --> Bool
             my IO::Handle:D $output = "$config/paths.p_th.new".IO.open: :w, :nl-out("\n"), :chomp(True);
             my Str $ln;
             while $ln = $input.get {
-                if $ln ~~ rx/^ \s* <$key> \s* [ '-->' || '=>' ] \s* .* $/ {
+                if $ln ~~ rx/^ \h* <$key> \h* [ '-->' || '=>' ] \h* .* $/ {
                     $output.say: $line;
                 } else {
                     $output.say: $ln
