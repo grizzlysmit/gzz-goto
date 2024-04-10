@@ -13,13 +13,12 @@ fn goto {| @_args |
         e:exa -FlaahigHb  --colour-scale --time-style=full-iso
     } elif (== (count $_args) 1) {
         if (==s $_args[0] '--help') {
-             var USAGE = (str:join ' ' [(e:paths.raku --help)])
-             echo (re:replace '\bpaths.raku\b' "\n  goto" $USAGE)
+             e:goto --help
         } elif (==s $_args[0] '-') {
             dir:cd -
             e:exa -FlaahigHb  --colour-scale --time-style=full-iso
         } else {
-             var res = (e:paths.raku $_args[0])
+             var res = (e:goto $_args[0])
              if (==s $res '') {
                 echo "error: "$_args[0]" not found"
              } else {
@@ -28,6 +27,6 @@ fn goto {| @_args |
              }
         }
     } else {
-        e:paths.raku $@_args
+        e:goto $@_args
     }
 }

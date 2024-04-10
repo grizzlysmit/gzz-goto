@@ -24,15 +24,16 @@ function goto(){
        0) cd;;
        1) if [[ "$1" == "--help" ]]
           then
-             USAGE="$(paths.raku --help)"
-             echo "${USAGE//paths.raku/goto}"
+             #USAGE="$(paths.raku --help)"
+             #echo "${USAGE//paths.raku/goto}"
+             command goto --help
           elif [ "$1" == "-" ]
           then
               cd -
               # shellcheck disable=SC2119
               eb
           else
-             arg=$(paths.raku "$1")
+             arg=$(command goto "$1")
              if [ -z "$arg" ]
              then
                  echo "error: $1 not found"
@@ -42,7 +43,7 @@ function goto(){
                  eb
              fi
           fi;;
-      *) paths.raku "$@";;
+      *) command goto "$@";;
    esac
 }
 # vim: :set filetype=sh :autoindent #
