@@ -21,7 +21,8 @@ function eb(){
 }
 function goto(){
    case $# in
-       0) cd;;
+       0) cd
+          eb;;
        1) if [[ "$1" == "--help" ]]
           then
              #USAGE="$(paths.raku --help)"
@@ -36,7 +37,13 @@ function goto(){
              arg=$(command goto "$1")
              if [ -z "$arg" ]
              then
-                 echo "error: $1 not found"
+                 if [ -d "$1" ]
+                 then
+                     cd "$1"
+                     eb
+                 else
+                     echo "error: $1 not found"
+                 fi
              else
                  cd "$arg"
                  # shellcheck disable=SC2119

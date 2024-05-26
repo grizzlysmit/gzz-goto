@@ -7,6 +7,7 @@
 use str
 use re
 use github.com/zzamboni/elvish-modules/dir
+use os
 fn goto {| @_args | 
     if (== (count $_args) 0) {
         dir:cd 
@@ -20,7 +21,12 @@ fn goto {| @_args |
         } else {
              var res = (e:goto $_args[0])
              if (==s $res '') {
-                echo "error: "$_args[0]" not found"
+                if (os:is-dir &follow-symlink=$true $_args[0]) {
+                    cd $_args[0]
+                    e:exa -F -laahigHb  --colour-scale --time-style=full-iso
+                else {
+                    echo "error: "$_args[0]" not found"
+                }
              } else {
                 dir:cd $res
                 e:exa -F -laahigHb  --colour-scale --time-style=full-iso
