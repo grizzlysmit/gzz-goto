@@ -24,7 +24,7 @@ fn goto {| @_args |
                 if (os:is-dir &follow-symlink=$true $_args[0]) {
                     cd $_args[0]
                     e:exa -F -laahigHb  --colour-scale --time-style=full-iso
-                else {
+                } else {
                     echo "error: "$_args[0]" not found"
                 }
              } else {
