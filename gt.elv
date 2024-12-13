@@ -36,3 +36,6 @@ fn goto {| @_args |
         e:goto $@_args
     }
 }
+fn g {| @_args |
+  goto $@_args
+}

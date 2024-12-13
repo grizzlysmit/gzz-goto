@@ -53,4 +53,5 @@ function goto(){
       *) command goto "$@";;
    esac
 }
+alias g="goto"
 # vim: :set filetype=sh :autoindent #
