@@ -16,7 +16,7 @@ function eb(){
     then
         exa -F -laahigHb  --colour-scale --time-style=full-iso --icons=always "$@"
     else
-        ls -Flaghi --color --author "$@"
+        ls -Flaghi --color "$@"
     fi
 }
 function goto(){
