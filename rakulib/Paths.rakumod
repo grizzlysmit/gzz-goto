@@ -510,7 +510,7 @@ sub resolve-dir(Str $dir, Bool $relative-to-home = True) returns Str is export {
 sub resolve-alias(Str:D $key --> Str:D) {
     my Str:D $KEY    = $key;
     my %val          = %the-lot{$KEY};
-    my Str:D $return = %val«value»;
+    my Str:D $return = %val«path»;
     my Str:D $type   = %val«type»;
     while $type eq 'alias' {
         $KEY         = $return;
@@ -519,7 +519,7 @@ sub resolve-alias(Str:D $key --> Str:D) {
             return '';
         }
         %val         = %the-lot{$KEY};
-        $return      = %val«value»;
+        $return      = %val«path»;
         $type        = %val«type»;
     }
     unless $type eq 'dir' {
