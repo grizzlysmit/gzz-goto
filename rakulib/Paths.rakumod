@@ -12,6 +12,19 @@ use File::Utils;
 #use Grammar::Debugger;
 #use Grammar::Tracer;
 #use trace;
+INIT my $debug = False;
+####################################
+#                                  #
+#  To turn On or Off debuggging    #
+#  Comment or Uncomment this       #
+#  following line.                 #
+#                                  #
+####################################
+#INIT $debug = True; use Grammar::Debugger;
+
+#use Grammar::Tracer;
+
+INIT "Grammar::Debugger is on".say if $debug;
 
 # the home dir #
 constant $home is export = %*ENV<HOME>.Str();
@@ -40,13 +53,14 @@ sub generate-configs(Str:D $file, Str:D $config) returns Bool:D {
                 given $file {
                     when 'paths.p_th' {
                         $content = q:to/END/;
-                        #mappings #
-                        ex         =>  fred@example.com :  22     # example entry
+                        #key                 => path                  # comment   #
+                        ex                   =>  fred@example.com     # example entry
 
                         END
                     }
                 }
                 $content .=trim-trailing;
+                $content ~= "\n";
                 if "$config/$file".IO !~~ :e || "$config/$file".IO.s == 0 {
                     "$config/$file".IO.spurt: $content, :append;
                 }
@@ -57,13 +71,14 @@ sub generate-configs(Str:D $file, Str:D $config) returns Bool:D {
     given $file {
         when 'paths.p_th' {
             my Str $content = q:to/END/;
-            #paths #
-            home                 => ~
-            rkl                  => ~/rakulib
-            bin                  => ~/bin
+            #key                 => path                  # comment   #
+            home                 => ~                     # home      #
+            rkl                  => ~/rakulib             # raklulib  #
+            bin                  => ~/bin                 # home/bin  #
 
             END
             $content .=trim-trailing;
+            $content ~= "\n";
             my Bool $r = $fd.put: $content;
             "could not write $config/$file".say if ! $r;
             $result ?&= $r;
@@ -117,7 +132,7 @@ unless init-gui-editors(@path-config-files, $config, &generate-configs, &check-f
 #`«««
     ##################################################################
     #                                                                #
-    #    grammars for parsing paths.h_ts the paths data base file    #
+    #    grammars for parsing paths.p_ts the paths data base file    #
     #                                                                #
     ##################################################################
 #»»»
@@ -129,6 +144,7 @@ grammar Key {
 role KeyActions {
     method key($/) {
         my $k = (~$/).trim;
+        dd $k if $debug;
         make $k;
     }
 }
@@ -138,7 +154,8 @@ grammar Paths {
     token absolute-path { [ '/' | '~' | '~/' ]  <path-segments>? }
     token relative-path { <path-segments> }
     regex path-segments { <path-segment> [ '/' <path-segment> ]* '/'? }
-    regex path-segment  { \w* [ [ '-' || \h || '+' || ':' || '@' || '=' || '!' || ',' || '&' || '&' || '%' || '$' || '(' || ')' '[' || ']' || '{' || '}' || ';' || '.' ]+ \w* ]* }
+    # regex path-segment  { \w* [ [ '-' || \h || '+' || ':' || '@' || '=' || '!' || ',' || '&' || '&' || '%' || '$' || '(' || ')' '[' || ']' || '{' || '}' || ';' || '.' ]+ \w* ]* }
+    regex path-segment  { \w* [ [ <-[\/\#\s]>+ || ' '+ ]+ \w* ]* }
 }
 
 role PathsActions {
@@ -149,24 +166,35 @@ role PathsActions {
         } elsif $/<relative-path> {
             $abs-rel-path = $/<relative-path>.made;
         }
+        dd $abs-rel-path if $debug;
         make $abs-rel-path;
     }
     method absolute-path($/) {
         my Str $abs-path;
         if $/<path-segments> {
-            $abs-path = ~$/.trim;
+            $abs-path = ~$/<path-segments>.trim;
+            dd $abs-path if $debug;
         } else {
             $abs-path = ~$/.trim;
+            dd $abs-path if $debug;
         }
+        dd $abs-path if $debug;
         make $abs-path;
     }
     method path-relative($/) {
-        make ~$/.trim
+        my $path-relative = ~$/<path-segments>.made;
+        dd $path-relative if $debug;
+        make $path-relative;
     }
-    method path-segment($/) { make $/<path-segment>.made }
+    method path-segment($/) {
+        my $path-segment = (~$/).trim;
+        dd $path-segment if $debug;
+        make $path-segment;
+    }
     method path-segments($/) {
-        #my @made-elts = $/».made;
-        #make @made-elts.join('/');
+        my @path-segments = $/».made;
+        dd @path-segments if $debug;
+        make @path-segments.join('/');
     }
 }
 
@@ -200,6 +228,7 @@ class PathFileActions does KeyActions does PathsActions {
         } elsif $/<comment-line> {
             %line = $/<comment-line>.made;
         }
+        dd %line if $debug;
         make %line;
     }
     method white-space-line($/) {
@@ -235,6 +264,8 @@ class PathFileActions does KeyActions does PathsActions {
         }
         $line-no++;
         %dir«line-no» = $line-no;
+        dd $line-no if $debug;
+        dd %dir if $debug;
         make $/<key>.made => %dir;
     }
     method alias  ($/) {
@@ -245,11 +276,13 @@ class PathFileActions does KeyActions does PathsActions {
             #$com ~~ s:g/ $<closer> = [ '}' ] /\\$<closer>/;
             %alias«comment» = $com;
         }
+        dd %alias if $debug;
         make $/<key>.made => %alias;
     }
     method target ($/) { make $/<key>.made }
     method TOP($match) {
         my %top = $match<line>.map: *.made;
+        dd %top if $debug;
         $match.make: %top;
     }
 } # class PathFileActions does KeyActions does PathsActions #
