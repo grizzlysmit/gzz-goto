@@ -1,0 +1,35 @@
+{
+  "test-depends": [
+    ""
+  ],
+  "name": "GOTO",
+  "description": "A Raku module to provide an object Gzz_readline which provides method Gzz_readline::gzzreadline(Str:D $prompt, Str:D $frefill).",
+  "provides": {
+    "Gzz::Prompt": "lib/Gzz/Prompt.rakumod"
+  },
+  "license": "LGPL-3.0-or-later",
+  "version": "0.1.2",
+  "perl": "6.d",
+  "source-url": "https://github.com/grizzlysmit/Gzz-Prompt.git",
+  "support": {
+    "bugtracker": "https://github.com/grizzlysmit/Gzz-Prompt/issues",
+    "source": "https://github.com/grizzlysmit/Gzz-Prompt.git",
+    "email": "grizzly@smit.id.au"
+  },
+  "depends": [
+    ""
+  ],
+  "tags": [
+    "readline",
+    "prompt",
+    "edit",
+    "prefill",
+    "cli",
+    "term",
+    "terminal"
+  ],
+  "auth": "zef:grizzlysmit",
+  "authors": [
+    "Francis Grizzly Smit <grizzly@smit.id.au>"
+  ]
+}

@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>goto</title>
+    <meta charset="UTF-8"/>
+    <style>hr,
+img {
+    box-sizing: content-box
+}
+body::after,
+body::before,
+hr::after,
+hr::before {
+    display: table;
+    content: ""
+}
+a,
+a:not([href]) {
+    text-decoration: none
+}
+
+hr,
+svg:not(:root) {
+    overflow: hidden
+}
+
+img,
+table tr {
+    background-color: #fff
+}
+
+pre,
+table {
+    overflow: auto
+}
+
+dl,
+dl dt,
+hr,
+pre code,
+pre>code,
+td,
+th {
+    padding: 0
+}
+
+input,
+pre code {
+    overflow: visible
+}
+
+pre,
+pre code {
+    word-wrap: normal
+}
+
+body {
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    color: #333;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 16px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    width: 820px;
+    margin: 2em auto;
+}
+
+a {
+    background-color: transparent;
+    -webkit-text-decoration-skip: objects;
+    color: #4078c0
+}
+
+a:active,
+a:hover {
+    outline-width: 0;
+    text-decoration: underline
+}
+
+h1 {
+    margin: .67em 0
+}
+
+img {
+    border-style: none;
+    max-width: 100%
+}
+
+h1,
+h2 {
+    padding-bottom: .3em;
+    border-bottom: 1px solid #eee
+}
+
+input {
+    font: inherit;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit
+}
+
+* {
+    box-sizing: border-box
+}
+
+strong {
+    font-weight: 600
+}
+
+body::after,
+hr::after {
+    clear: both
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    display: block;
+    width: 100%
+}
+
+blockquote {
+    margin: 0;
+    padding: 0 1em;
+    color: #777;
+    border-left: .25em solid #ddd
+}
+
+ol ol,
+ul ol {
+    list-style-type: lower-roman
+}
+
+ol ol ol,
+ol ul ol,
+ul ol ol,
+ul ul ol {
+    list-style-type: lower-alpha
+}
+
+dd {
+    margin-left: 0
+}
+
+code {
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace
+}
+
+pre {
+    font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace
+}
+
+input {
+    -webkit-font-feature-settings: "liga" 0;
+    font-feature-settings: "liga" 0
+}
+
+body>:first-child {
+    margin-top: 0!important
+}
+
+body>:last-child {
+    margin-bottom: 0!important
+}
+
+a:not([href]) {
+    color: inherit
+}
+
+blockquote,
+dl,
+ol,
+p,
+pre,
+table,
+ul {
+    margin-top: 0;
+    margin-bottom: 16px
+}
+
+hr {
+    background: #e7e7e7;
+    height: .25em;
+    margin: 24px 0;
+    border: 0
+}
+
+blockquote>:first-child {
+    margin-top: 0
+}
+
+blockquote>:last-child {
+    margin-bottom: 0
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    line-height: 1.25
+}
+
+dl dt,
+table th {
+    font-weight: 700
+}
+
+h1 code,
+h1 tt,
+h2 code,
+h2 tt,
+h3 code,
+h3 tt,
+h4 code,
+h4 tt,
+h5 code,
+h5 tt,
+h6 code,
+h6 tt {
+    font-size: inherit
+}
+
+h1 {
+    font-size: 2em
+}
+
+h2 {
+    font-size: 1.5em
+}
+
+h3 {
+    font-size: 1.25em
+}
+
+h4 {
+    font-size: 1em
+}
+
+h5 {
+    font-size: .875em
+}
+
+h6 {
+    font-size: .85em;
+    color: #777
+}
+
+ol,
+ul {
+    padding-left: 2em
+}
+
+ol ol,
+ol ul,
+ul ol,
+ul ul {
+    margin-top: 0;
+    margin-bottom: 0
+}
+
+li>p {
+    margin-top: 16px
+}
+
+li+li {
+    margin-top: .25em
+}
+
+dl dt {
+    margin-top: 16px;
+    font-size: 1em;
+    font-style: italic
+}
+
+dl dd {
+    padding: 0 16px;
+    margin-bottom: 16px
+}
+
+table td,
+table th {
+    padding: 6px 13px;
+    border: 1px solid #ddd
+}
+
+table tr {
+    border-top: 1px solid #ccc
+}
+
+table tr:nth-child(2n) {
+    background-color: #f8f8f8
+}
+
+code {
+    padding: .2em 0;
+    margin: 0;
+    font-size: 85%;
+    background-color: rgba(0, 0, 0, .04);
+    border-radius: 3px
+}
+
+code::after,
+code::before {
+    letter-spacing: -.2em;
+    content: "\00a0"
+}
+
+pre>code {
+    margin: 0;
+    font-size: 100%;
+    word-break: normal;
+    white-space: pre;
+    background: 0 0;
+    border: 0
+}
+
+pre {
+    padding: 16px;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f7f7f7;
+    border-radius: 3px
+}
+
+pre code {
+    display: inline;
+    max-width: auto;
+    margin: 0;
+    line-height: inherit;
+    background-color: transparent;
+    border: 0
+}
+
+pre code::after,
+pre code::before {
+    content: normal
+}
+
+kbd {
+    display: inline-block;
+    padding: 3px 5px;
+    font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    line-height: 10px;
+    color: #555;
+    vertical-align: middle;
+    background-color: #fcfcfc;
+    border: 1px solid #ccc;
+    border-bottom-color: #bbb;
+    border-radius: 3px;
+    box-shadow: inset 0 -1px 0 #bbb
+}
+
+hr {
+    border-bottom-color: #eee
+}
+</style>
+
+    
+</head>
+
+<body class="pod">
+    <div id="___top"></div>
+    <nav class="indexgroup">
+<table id="TOC">
+<caption><h2 id="TOC_Title">Table of Contents</h2></caption>
+<tr class="toc-level-2"><td class="toc-number">0.1</td><td class="toc-text"><a href="#Table_of_Contents">Table of Contents</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#Introduction">Introduction</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">1.1</td><td class="toc-text"><a href="#multi_sub_MAIN(Str:D_$key_--&gt;_int)">multi sub MAIN(Str:D $key --&gt; int)</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">1.2</td><td class="toc-text"><a href="#GOTO">GOTO</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">1.2.1</td><td class="toc-text"><a href="#Basics_from_github">Basics from github</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">1.3</td><td class="toc-text"><a href="#config_files">config files </a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">1.4</td><td class="toc-text"><a href="#To_use_from_bash">To use from bash</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">1.5</td><td class="toc-text"><a href="#To_use_from_elvish">To use from elvish</a></td></tr>
+</table>
+</nav>
+
+
+    <div class="pod-body">
+    <h2 id="Table_of_Contents"><a class="u" href="#___top" title="go to top of document">Table of Contents</a></h2>
+<ul><li><p><a href="#name">NAME</a></p>
+</li>
+<li><p><a href="#author">AUTHOR</a></p>
+</li>
+<li><p><a href="#version">VERSION</a></p>
+</li>
+<li><p><a href="#title">TITLE</a></p>
+</li>
+<li><p><a href="#subtitle">SUBTITLE</a></p>
+</li>
+<li><p><a href="#copyright">COPYRIGHT</a></p>
+</li>
+<li><p><a href="#introduction">Introduction</a></p>
+</li>
+<li><p><a href="#class-gzz_readline">class Gzz_readline</a> or <a href="#class-gzz-readline">on raku.land class Gzz_readline</a></p>
+</li>
+</ul>
+<pre class="pod-block-code">use github.com/grizzlysmit/gzz-goto/gt
+fn goto {|@_args|
+    gt:goto $@_args
+}
+
+fn g {|@_args|
+    gt:g $@_args
+}
+
+</pre>
+<p><a href="#table-of-contents">Top of Document</a></p>
+<h1 id="Introduction"><a class="u" href="#___top" title="go to top of document">Introduction</a></h1>
+<p>GOTO is a mixture of a Raku app path.raku and a module Paths.rakumod that implements it and a set of script to apply them inside a shell instance This is important as you need the scripts to call cd from within the shell process in order to actually change it&#39;s current directory otherwise we would only change a subprocesses current directory and then nothing would have been achieved on exit. The scripts are .goto_bash_aliases -&gt; /home/grizzlysmit/Projects/elvish/gzz-goto/bash_aliases in bash and the combination of some lines in your rc.elv file and a elevish module gt.elv.</p>
+<p><a href="https://github.com/grizzlysmit/gzz-goto/gt">See gzz-goto/gt</a>.</p>
+<h2 id="multi_sub_MAIN(Str:D_$key_-->_int)"><a class="u" href="#___top" title="go to top of document">multi sub MAIN(Str:D $key --&gt; int)</a></h2>
+<pre class="pod-block-code">multi sub MAIN(Str:D $key --&gt; int){
+    say path($key);
+    return 0;
+} 
+
+</pre>
+<p><a href="#table-of-contents">Top of Document</a></p>
+<h2 id="GOTO"><a class="u" href="#___top" title="go to top of document">GOTO</a></h2>
+<h3 id="Basics_from_github"><a class="u" href="#___top" title="go to top of document">Basics from github</a></h3>
+<p>To set up the underpinings </p>
+<pre class="pod-block-code">cd &lt;path&gt;
+
+git clone https://github.com/grizzlysmit/gzz-goto.git
+
+cd
+
+mkdir rakulib
+
+cd rakulib
+
+ln -s &lt;path&gt;/gzz-goto/rakulib/Paths.rakumod
+
+cd
+
+mkdir bin
+
+cd bin
+
+ln -s &lt;path&gt;/gzz-goto/bin/paths.raku
+
+</pre>
+<p>where <strong>path</strong> is the path you have chosen to clone the github repository to.</p>
+<ul><li><p>make sure $HOME/bin is in your search path, and also raku needs to be installed.</p>
+</li>
+</ul>
+<h2 id="config_files"><a class="u" href="#___top" title="go to top of document">config files </a></h2>
+<p>if you have sysamin privaliges you may want to put config files in <code>/etc/skel/.local/share/paths/</code></p>
+<p>just run </p>
+<pre class="pod-block-code">sudo cp -rv &lt;path&gt;/.local/ /etc/skel/
+
+</pre>
+<h2 id="To_use_from_bash"><a class="u" href="#___top" title="go to top of document">To use from bash</a></h2>
+<pre class="pod-block-code">cd
+
+ln -s &lt;path&gt;/gzz-goto/bash_aliases ~/.goto_bash_aliases
+
+or
+
+ln -s &lt;path&gt;/gzz-goto/bash_aliases ~/.prefered_name 
+
+and adjust bellow.
+
+gvim -p ~/.bashrc
+# or use another editor of your choice.
+
+</pre>
+<p>add </p>
+<pre class="pod-block-code">if [ -e &quot;$HOME/.goto_bash_aliases&quot; ]
+then
+    # shellcheck disable=SC1090
+    source ~/.goto_bash_aliases
+fi
+
+</pre>
+<p>line <code># shellcheck disable=SC1090</code> for those who use shellcheck linter ideally you should use it or something equivalent </p>
+<h2 id="To_use_from_elvish"><a class="u" href="#___top" title="go to top of document">To use from elvish</a></h2>
+<pre class="pod-block-code">use epm
+
+epm:install github.com/grizzlysmit/gzz-goto
+
+</pre>
+<p>add this to your rc.elv</p>
+<ul><li><p>these four lines are optional if you have done the epm:install above then this is redundant but if you want your rc.elv to be portable then add them anyway</p>
+</li>
+</ul>
+<pre class="pod-block-code">use epm
+
+epm:install &amp;silent-if-installed         ^
+     github.com/grizzlysmit/gzz-goto
+
+</pre>
+<ul><li><p>definately add these lines.</p>
+</li>
+</ul>
+<pre class="pod-block-code">use github.com/grizzlysmit/gzz-goto/gt
+
+fn goto {|@_args|
+    gt:goto $@_args
+}
+
+</pre>
+
+    </div>
+
+    
+</body>
+</html>
+
