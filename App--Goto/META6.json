@@ -1,0 +1,17 @@
+{
+  "auth": "zef:grizzlysmit",
+  "build-depends": [
+  ],
+  "depends": [
+  ],
+  "description": "A brand new and very nice module",
+  "name": "App--Goto",
+  "provides": {
+    "App::Goto": "lib/App/Goto.rakumod"
+  },
+  "resources": [
+  ],
+  "test-depends": [
+  ],
+  "version": "0.0.1"
+}
