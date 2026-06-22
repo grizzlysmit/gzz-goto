@@ -12,5 +12,6 @@
         "raku"
     ],
     "additional-pod-files": [
+        "Paths"
     ]
 }
