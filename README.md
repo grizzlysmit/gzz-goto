@@ -15,8 +15,6 @@ Table of Contents
 
   * [Introduction](#introduction)
 
-  * [class Gzz_readline](#class-gzz_readline) or [on raku.land class Gzz_readline](#class-gzz-readline)
-
 NAME
 ====
 
