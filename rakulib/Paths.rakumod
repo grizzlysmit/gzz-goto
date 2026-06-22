@@ -24,20 +24,7 @@ INIT my $debug = False;
 
 =begin pod
 
-=begin head2
 
-Table of Contents
-
-=end head2
-
-=item1 L<NAME|#name>
-=item1 L<AUTHOR|#author>
-=item1 L<VERSION|#version>
-=item1 L<TITLE|#title>
-=item1 L<SUBTITLE|#subtitle>
-=item1 L<COPYRIGHT|#copyright>
-=item1 L<Introduction|#introduction>
-=item1 L<class Gzz_readline|#class-gzz_readline> or L<on raku.land class Gzz_readline|#class-gzz-readline>
 
 =NAME Paths.rakumod 
 =AUTHOR Francis Grizzly Smit (grizzly@smit.id.au)

@@ -183,25 +183,6 @@ fn goto {|@_args|
 }
 ```
 
-Table of Contents
------------------
-
-  * [NAME](#name)
-
-  * [AUTHOR](#author)
-
-  * [VERSION](#version)
-
-  * [TITLE](#title)
-
-  * [SUBTITLE](#subtitle)
-
-  * [COPYRIGHT](#copyright)
-
-  * [Introduction](#introduction)
-
-  * [class Gzz_readline](#class-gzz_readline) or [on raku.land class Gzz_readline](#class-gzz-readline)
-
 NAME
 ====
 
