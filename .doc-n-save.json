@@ -1,6 +1,6 @@
 {
     "comment": "using doc-n-save",
-    "separate-markdown-files": false,
+    "separate-markdown-files": true,
     "markdown-path": "README.md",
     "bin": "bin",
     "only-app": false,
