@@ -37,7 +37,7 @@ Table of Contents
 =item1 L<SUBTITLE|#subtitle>
 =item1 L<COPYRIGHT|#copyright>
 =item1 L<Introduction|#introduction>
-=item1 L<class Gzz_readline|#class-gzz_readline> or L<on raku.land class Gzz_readline|#class-gzz-readline>
+=item1 L<grammars|#grammars>
 
 =NAME Paths.rakumod 
 =AUTHOR Francis Grizzly Smit (grizzly@smit.id.au)
@@ -57,7 +57,7 @@ A Raku module to implement the paths command which keeps and accesses a database
 
 
 
-=head2 class Gzz_readline
+=head2 grammars
 
 =begin code :lang<raku>
 
