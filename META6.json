@@ -1,35 +1,35 @@
 {
-  "test-depends": [
-    ""
+  "auth": "zef:grizzlysmit",
+  "authors": [
+    "Francis Grizzly Smit <grizzly@smit.id.au>"
   ],
-  "name": "GOTO",
-  "description": "A Raku module to provide an object Gzz_readline which provides method Gzz_readline::gzzreadline(Str:D $prompt, Str:D $frefill).",
-  "provides": {
-    "Gzz::Prompt": "lib/Gzz/Prompt.rakumod"
-  },
-  "license": "LGPL-3.0-or-later",
-  "version": "0.1.2",
-  "perl": "6.d",
-  "source-url": "https://github.com/grizzlysmit/Gzz-Prompt.git",
-  "support": {
-    "bugtracker": "https://github.com/grizzlysmit/Gzz-Prompt/issues",
-    "source": "https://github.com/grizzlysmit/Gzz-Prompt.git",
-    "email": "grizzly@smit.id.au"
-  },
   "depends": [
     ""
   ],
+  "description": "GOTO is a mixture of a Raku app path.raku and a module Paths.rakumod that implements it and a set of script to apply them inside a shell instance This is important as you need the scripts to call cd from within the shell process in order to actually change it's current directory otherwise we would only change a subprocesses current directory and then nothing would have been achieved on exit. The scripts are .goto_bash_aliases -> /home/grizzlysmit/Projects/elvish/gzz-goto/bash_aliases in bash and the combination of some lines in your rc.elv file and a elevish module gt.elv.",
+  "license": "GPL-3.0-or-later",
+  "name": "GOTO",
+  "perl": "6.d",
+  "provides": {
+    "Paths.rakumod": "lib/Gzz/Paths.raku",
+    "paths.raku": "lib/Gzz/paths.raku"
+  },
+  "source-url": "https://github.com/grizzlysmit/gzz-goto.git",
+  "support": {
+    "bugtracker": "https://github.com/grizzlysmit/gzz-goto/issues",
+    "email": "grizzly@smit.id.au",
+    "source": "https://github.com/grizzlysmit/gzz-goto.git"
+  },
   "tags": [
-    "readline",
-    "prompt",
-    "edit",
-    "prefill",
+    "goto",
+    "paths",
+    "bookmarks",
     "cli",
     "term",
     "terminal"
   ],
-  "auth": "zef:grizzlysmit",
-  "authors": [
-    "Francis Grizzly Smit <grizzly@smit.id.au>"
-  ]
+  "test-depends": [
+    ""
+  ],
+  "version": "0.1.1"
 }
