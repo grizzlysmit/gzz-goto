@@ -22,6 +22,209 @@ INIT my $debug = False;
 ####################################
 #INIT $debug = True; use Grammar::Debugger;
 
+=begin pod
+
+=begin head2
+
+Table of Contents
+
+=end head2
+
+=item1 L<NAME|#name>
+=item1 L<AUTHOR|#author>
+=item1 L<VERSION|#version>
+=item1 L<TITLE|#title>
+=item1 L<SUBTITLE|#subtitle>
+=item1 L<COPYRIGHT|#copyright>
+=item1 L<Introduction|#introduction>
+=item1 L<class Gzz_readline|#class-gzz_readline> or L<on raku.land class Gzz_readline|#class-gzz-readline>
+
+=NAME Paths.rakumod 
+=AUTHOR Francis Grizzly Smit (grizzly@smit.id.au)
+=VERSION 0.1.0
+=TITLE Paths.rakumod
+=SUBTITLE A Raku module to implement the paths command which keeps and accesses a database of bookmarks in the directory tree.
+
+=COPYRIGHT
+LGPL V3.0+ L<LICENSE|https://github.com/grizzlysmit/Syntax-Highlighters/blob/main/LICENSE>
+
+
+L<Top of Document|#table-of-contents>
+
+=head1 Introduction
+
+A Raku module to implement the paths command which keeps and accesses a database of bookmarks in the directory tree.
+
+
+
+=head2 class Gzz_readline
+
+=begin code :lang<raku>
+
+#`«««
+    ##################################################################
+    #                                                                #
+    #    grammars for parsing paths.p_ts the paths data base file    #
+    #                                                                #
+    ##################################################################
+#»»»
+
+grammar Key {
+    regex key { \w* [ <-[\h]>+ \w* ]* }
+}
+
+role KeyActions {
+    method key($/) {
+        my $k = (~$/).trim;
+        dd $k if $debug;
+        make $k;
+    }
+}
+
+grammar Paths {
+    token path         { [ <absolute-path> || <relative-path> ] }
+    token absolute-path { [ '/' | '~' | '~/' ]  <path-segments>? }
+    token relative-path { <path-segments> }
+    regex path-segments { <path-segment> [ '/' <path-segment> ]* '/'? }
+    regex path-segment  { \w* [ [ <-[\/\#\s]>+ || \h+ ]+ \w* ]* }
+} 
+
+role PathsActions {
+    method path($/) {
+        my Str $abs-rel-path;
+        if $/<absolute-path> {
+            $abs-rel-path = $/<absolute-path>.made;
+        } elsif $/<relative-path> {
+            $abs-rel-path = $/<relative-path>.made;
+        }
+        dd $abs-rel-path if $debug;
+        make $abs-rel-path;
+    }
+    method absolute-path($/) {
+        my Str $abs-path;
+        if $/<path-segments> {
+            $abs-path = ~$/<path-segments>.trim;
+            dd $abs-path if $debug;
+        } else {
+            $abs-path = ~$/.trim;
+            dd $abs-path if $debug;
+        }
+        dd $abs-path if $debug;
+        make $abs-path;
+    }
+    method path-relative($/) {
+        my $path-relative = ~$/<path-segments>.made;
+        dd $path-relative if $debug;
+        make $path-relative;
+    }
+    method path-segment($/) {
+        my $path-segment = (~$/).trim;
+        dd $path-segment if $debug;
+        make $path-segment;
+    }
+    method path-segments($/) {
+        my @path-segments = $/».made;
+        dd @path-segments if $debug;
+        make @path-segments.join('/');
+    }
+}
+
+grammar PathsFile is Key is Paths {
+    token TOP                 { <line> [ \v+ <line> ]* \v* }
+    regex line                { [ <white-space-line> || <dir> || <alias> || <header-line> || <line-of-hashes> || <comment-line> ] }
+    regex white-space-line    { ^^ \h* $$ }
+    token header-line         { ^^ \h* '#' <header> \h* $$ }
+    token header              { 'key' \h+ 'sep' \h+ 'path' \h+ ':' \h+ '#' \h+ 'comment' }
+    token line-of-hashes      { ^^ \h* '#'+ $$ }
+    regex comment-line        { ^^ \h* '#' <-[\v]>* $$ }
+    token dir                 { <key> \h* '=>' \h* <path> \h* [ '#' \h* <comment> \h* ]? }
+    token alias               { <key> \h* '-->' \h* <target=.key> \h* [ '#' \h* <comment> \h* ]? }
+    token comment             { <-[\n]>* }
+}
+
+my $line-no = 0;
+class PathFileActions does KeyActions does PathsActions {
+    method line($/) {
+        my %line;
+        if $/<white-space-line> {
+            %line = $/<white-space-line>.made;
+        }elsif $/<dir> {
+            %line = $/<dir>.made;
+        } elsif $/<alias> {
+            %line = $/<alias>.made;
+        } elsif $/<header-line> {
+            %line = $/<header-line>.made;
+        } elsif $/<line-of-hashes> {
+            %line = $/<line-of-hashes>.made;
+        } elsif $/<comment-line> {
+            %line = $/<comment-line>.made;
+        }
+        dd %line if $debug;
+        make %line;
+    }
+    method white-space-line($/) {
+        $line-no++;
+        my %white-space-line = type => 'white-space-line', line-no => $line-no, value => ~$/;
+        make ~$line-no => %white-space-line;
+    }
+    method header-line($/) {
+        $line-no++;
+        my %header-line = type => 'header-line', line-no => $line-no, value => $/<header>.made;
+        make ~$line-no => %header-line;
+    }
+    method header($/) {
+        my $header = ~$/;
+        make $header;
+    }
+    method line-of-hashes($/) {
+        $line-no++;
+        my %line-of-hashes = type => 'line-of-hashes', line-no => $line-no, value => ~$/;
+        make '##' => %line-of-hashes;
+    }
+    method comment-line($/) {
+        $line-no++;
+        my %comment-line = type => 'comment-line', line-no => $line-no, value => ~$/;
+        make ~$line-no => %comment-line;
+    }
+    method comment($/)   { make ~$/; }
+    method dir   ($/)  {
+        my %dir = type => 'dir', path => $/<path>.made;
+        if $/<comment> {
+            my Str $com = ~($/<comment>).trim;
+            %dir«comment» = $com;
+        }
+        $line-no++;
+        %dir«line-no» = $line-no;
+        dd $line-no if $debug;
+        dd %dir if $debug;
+        make $/<key>.made => %dir;
+    }
+    method alias  ($/) {
+        $line-no++;
+        my %alias =  type => 'alias', line-no => $line-no, path => $/<target>.made;
+        if $/<comment> {
+            my $com = ~($/<comment>).trim;
+            #$com ~~ s:g/ $<closer> = [ '}' ] /\\$<closer>/;
+            %alias«comment» = $com;
+        }
+        dd %alias if $debug;
+        make $/<key>.made => %alias;
+    }
+    method target ($/) { make $/<key>.made }
+    method TOP($match) {
+        my %top = $match<line>.map: *.made;
+        dd %top if $debug;
+        $match.make: %top;
+    }
+} # class PathFileActions does KeyActions does PathsActions #
+
+=end code
+
+L<Top of Document|#table-of-contents>
+
+
+=end pod
+
 #use Grammar::Tracer;
 
 INIT "Grammar::Debugger is on".say if $debug;
@@ -154,8 +357,7 @@ grammar Paths {
     token absolute-path { [ '/' | '~' | '~/' ]  <path-segments>? }
     token relative-path { <path-segments> }
     regex path-segments { <path-segment> [ '/' <path-segment> ]* '/'? }
-    # regex path-segment  { \w* [ [ '-' || \h || '+' || ':' || '@' || '=' || '!' || ',' || '&' || '&' || '%' || '$' || '(' || ')' '[' || ']' || '{' || '}' || ';' || '.' ]+ \w* ]* }
-    regex path-segment  { \w* [ [ <-[\/\#\s]>+ || ' '+ ]+ \w* ]* }
+    regex path-segment  { \w* [ [ <-[\/\#\s]>+ || \h+ ]+ \w* ]* }
 }
 
 role PathsActions {
