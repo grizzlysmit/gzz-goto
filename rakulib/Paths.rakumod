@@ -1,4 +1,4 @@
-unit module Paths:ver<0.1.6>:auth<Francis Grizzly Smit (grizzlysmit@smit.id.au)>;
+unit module Paths:ver<0.1.7>:auth<Francis Grizzly Smit (grizzlysmit@smit.id.au)>;
 
 use Terminal::ANSI::OO :t;
 use Terminal::WCWidth;
@@ -41,7 +41,7 @@ Table of Contents
 
 =NAME Paths.rakumod 
 =AUTHOR Francis Grizzly Smit (grizzly@smit.id.au)
-=VERSION 0.1.6
+=VERSION 0.1.7
 =TITLE Paths.rakumod
 =SUBTITLE A Raku module to implement the paths command which keeps and accesses a database of bookmarks in the directory tree.
 

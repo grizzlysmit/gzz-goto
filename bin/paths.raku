@@ -30,7 +30,7 @@ Table of Contents
 
 =NAME goto 
 =AUTHOR Francis Grizzly Smit (grizzly@smit.id.au)
-=VERSION 0.1.6
+=VERSION 0.1.7
 =TITLE goto
 =SUBTITLE GOTO is a cd alternative that acts like a database of bookmarks to different places in the directory tree.
 
