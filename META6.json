@@ -11,7 +11,7 @@
   "name": "GOTO",
   "perl": "6.d",
   "provides": {
-    "Paths.rakumod": "lib/Paths.raku",
+    "Paths.rakumod": "lib/Paths.rakumod",
     "paths.raku": "bin/paths.raku",
     "goto": "bin/goto",
     "g": "bin/g"
@@ -31,7 +31,7 @@
     "terminal"
   ],
   "test-depends": [
-    ""
+    "t/001-Meta-test.rakutest"
   ],
-  "version": "0.1.4"
+  "version": "0.1.5"
 }
