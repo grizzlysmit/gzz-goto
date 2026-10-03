@@ -29,7 +29,7 @@ fn goto {| @_args |
                 }
              } else {
                 dir:cd $res
-                e:exa -F -laahigHb  --colour-scale --time-style=full-iso --icons=always
+                e:exa -F -laahigHb  --color-scale --time-style=full-iso --icons=always
              }
         }
     } else {

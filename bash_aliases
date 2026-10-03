@@ -14,7 +14,7 @@ fi
 function eb(){
     if  type exa >> /dev/null 2>&1 
     then
-        exa -F -laahigHb  --colour-scale --time-style=full-iso --icons=always "$@"
+        exa -F -laahigHb  --color-scale --time-style=full-iso --icons=always "$@"
     else
         ls -Flaghi --color "$@"
     fi
