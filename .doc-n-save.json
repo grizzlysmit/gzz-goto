@@ -8,10 +8,8 @@
     "name": "paths",
     "lib": "rakulib",
     "exts": [
-        "rakumod",
         "raku"
     ],
     "additional-pod-files": [
-        "Paths"
     ]
 }

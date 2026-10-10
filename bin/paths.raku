@@ -10,7 +10,7 @@ use Gzz::Text::Utils;
 #use Syntax::Highlighters;
 use GUI::Editors;
 use Usage::Utils;
-use Paths;
+use Gzz::Paths;
 
 =begin pod
 
@@ -30,7 +30,7 @@ Table of Contents
 
 =NAME goto 
 =AUTHOR Francis Grizzly Smit (grizzly@smit.id.au)
-=VERSION 0.1.17
+=VERSION 0.1.18
 =TITLE goto
 =SUBTITLE GOTO is a cd alternative that acts like a database of bookmarks to different places in the directory tree.
 
