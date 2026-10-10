@@ -1,5 +1,5 @@
 {
-    "comment": "using doc-n-save",
+    "comment": "new version of GOTO",
     "separate-markdown-files": true,
     "markdown-path": "README.md",
     "bin": "bin",
