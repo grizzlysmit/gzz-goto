@@ -30,7 +30,14 @@ Table of Contents
 
 =NAME goto 
 =AUTHOR Francis Grizzly Smit (grizzly@smit.id.au)
-=VERSION 0.1.24
+
+=end pod
+
+my Version:D $version = v0.1.25;
+
+=begin pod
+
+=VERSION v0.1.25
 =TITLE goto
 =SUBTITLE GOTO is a cd alternative that acts like a database of bookmarks to different places in the directory tree.
 
@@ -191,7 +198,25 @@ fn goto {|@_args|
 
 =end pod
 
-multi sub MAIN(Str:D $key --> int){
+sub version(--> Version:D){
+    return $version;
+}
+
+multi sub MAIN(Bool:D :v(:$version) = False, *%named-args, *@args --> int){
+    if $version {
+        say version();
+        exit 0;
+    } else {
+        say-coloured($*USAGE, False, %named-args, @args);
+        exit 0;
+    }
+}
+
+multi sub MAIN(Str:D $key, Bool:D :v(:$version) = False --> int){
+    if $version {
+        say version();
+        exit 0;
+    }
     say path($key);
     return 0;
 }

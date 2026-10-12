@@ -15,6 +15,8 @@ fn goto {| @_args |
     } elif (== (count $_args) 1) {
         if (==s $_args[0] '--help') {
              e:goto --help
+        } elif (==s $_args[0] '--version')  {
+             e:goto --version
         } elif (==s $_args[0] '-') {
             dir:cd -
             e:exa -F -laahigHb  --colour-scale --time-style=full-iso --icons=always
