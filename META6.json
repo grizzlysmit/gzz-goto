@@ -22,8 +22,8 @@
   "perl": "6.d",
   "provides": {
     "paths.raku": "bin/paths.raku",
-    "goto": "bin/goto",
-    "g": "bin/g"
+    "goto":       "bin/goto",
+    "g":          "bin/g"
   },
   "source-url": "https://github.com/grizzlysmit/gzz-goto.git",
   "support": {
@@ -33,7 +33,7 @@
   },
   "resources": {
     ".goto_bash_aliases": "bash_aliases", 
-    "gt.elv": "gt.elv"
+    "gt.elv":             "gt.elv"
   },
   "tags": [
     "goto",
@@ -45,5 +45,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.1.23"
+  "version": "0.1.24"
 }
