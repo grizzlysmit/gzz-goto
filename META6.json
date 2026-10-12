@@ -23,7 +23,9 @@
   "provides": {
     "paths.raku": "bin/paths.raku",
     "goto": "bin/goto",
-    "g": "bin/g"
+    "g": "bin/g",
+    ".goto_bash_aliases": "bash_aliases", 
+    "gt.elv": "gt.elv"
   },
   "source-url": "https://github.com/grizzlysmit/gzz-goto.git",
   "support": {
@@ -41,5 +43,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.1.20"
+  "version": "0.1.21"
 }
