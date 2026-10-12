@@ -32,8 +32,8 @@
     "source": "https://github.com/grizzlysmit/gzz-goto.git"
   },
   "resources": {
-    ".goto_bash_aliases": "bash_aliases", 
-    "gt.elv":             "gt.elv"
+    "config/.goto_bash_aliases": "bash_aliases", 
+    "config/gt.elv":             "gt.elv"
   },
   "tags": [
     "goto",
@@ -45,5 +45,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.1.25"
+  "version": "0.1.26"
 }
