@@ -23,15 +23,17 @@
   "provides": {
     "paths.raku": "bin/paths.raku",
     "goto": "bin/goto",
-    "g": "bin/g",
-    ".goto_bash_aliases": "bash_aliases", 
-    "gt.elv": "gt.elv"
+    "g": "bin/g"
   },
   "source-url": "https://github.com/grizzlysmit/gzz-goto.git",
   "support": {
     "bugtracker": "https://github.com/grizzlysmit/gzz-goto/issues",
     "email": "grizzly@smit.id.au",
     "source": "https://github.com/grizzlysmit/gzz-goto.git"
+  },
+  "resources": {
+    ".goto_bash_aliases": "bash_aliases", 
+    "gt.elv": "gt.elv"
   },
   "tags": [
     "goto",
@@ -43,5 +45,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.1.22"
+  "version": "0.1.23"
 }
