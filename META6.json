@@ -20,7 +20,7 @@
   "license": "GPL-3.0-or-later",
   "name": "GOTO",
   "perl": "6.d",
-  "provides": {
+  "bin": {
     "paths.raku": "bin/paths.raku",
     "goto":       "bin/goto",
     "g":          "bin/g"
@@ -45,5 +45,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.1.26"
+  "version": "0.1.27"
 }
