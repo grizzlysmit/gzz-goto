@@ -1,9 +1,14 @@
-# vim: :set filetype=sh :autoindent #
+## vim: :set filetype=sh :autoindent #
 ##############################################################
 #                                                            #
 # goto function makes getting places in the file system easy #
 #                                                            #
 ##############################################################
+
+=begin pod
+
+=begin code :lang«bash»
+
 
 if [ -n "$RAKULIB" ]
 then
@@ -97,4 +102,9 @@ function g(){
       *) command goto "$@";;
    esac
 }
-# vim: :set filetype=sh :autoindent #
+
+=end code
+
+=end pod
+
+## vim: :set filetype=sh :autoindent #

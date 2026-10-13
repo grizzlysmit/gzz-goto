@@ -25,7 +25,9 @@
   "bin": {
     "paths.raku": "bin/paths.raku",
     "goto":       "bin/goto",
-    "g":          "bin/g"
+    "g":          "bin/g",
+    "=begin":     "bin/=begin",
+    "=end":       "bin/=end"
   },
   "source-url": "https://github.com/grizzlysmit/gzz-goto.git",
   "support": {
@@ -47,5 +49,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.1.30"
+  "version": "0.1.31"
 }
