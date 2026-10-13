@@ -7,7 +7,7 @@
 
 =begin pod
 
-=begin code ':lang«elvish»'
+=begin code :lang«elvish»
 
 use str
 use re
