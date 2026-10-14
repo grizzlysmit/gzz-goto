@@ -36,8 +36,6 @@
     "source": "https://github.com/grizzlysmit/gzz-goto.git"
   },
   "resources": {
-    "config/.goto_bash_aliases.rakudoc": "bash_aliases.rakudoc", 
-    "config/gt.rakudoc":                 "gt.rakudoc"
   },
   "tags": [
     "goto",
@@ -49,5 +47,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.1.39"
+  "version": "0.1.40"
 }
