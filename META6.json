@@ -37,7 +37,7 @@
   },
   "resources": {
     "config/.goto_bash_aliases.rakudoc": "bash_aliases.rakudoc", 
-    "config/gt.elv":                     "gt.elv"
+    "config/gt.rakudoc":                 "gt.rakudoc"
   },
   "tags": [
     "goto",
@@ -49,5 +49,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.1.35"
+  "version": "0.1.36"
 }
