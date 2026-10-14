@@ -1,4 +1,4 @@
 .*.swp
 scratch/*
-rakulib/.precomp/
+lib/.precomp/
 archive/
