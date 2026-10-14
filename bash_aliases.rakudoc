@@ -1,4 +1,4 @@
-## vim: :set filetype=sh :autoindent #
+## vim: :set filetype=raku :autoindent #
 ##############################################################
 #                                                            #
 # goto function makes getting places in the file system easy #
@@ -36,7 +36,7 @@ function goto(){
              #USAGE="$(paths.raku --help)"
              #echo "${USAGE//paths.raku/goto}"
              command goto --help
-          elif [[ "$1" == "--version" ]]
+          elif [[ "$1" == "--version" ]] || [[ "$1" == "-v" ]]
           then
               command goto --version
           elif [[ "$1" == "-" ]]
@@ -74,7 +74,7 @@ function g(){
              #USAGE="$(paths.raku --help)"
              #echo "${USAGE//paths.raku/g}"
              command g --help
-          elif [[ "$1" == "--version" ]]
+          elif [[ "$1" == "--version" ]] || [[ "$1" == "-v" ]]
           then
               command g --version
           elif [[ "$1" == "-" ]]

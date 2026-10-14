@@ -20,7 +20,7 @@ fn goto {| @_args |
     } elif (== (count $_args) 1) {
         if (==s $_args[0] '--help') {
              e:goto --help
-        } elif (==s $_args[0] '--version')  {
+        } elif (or (==s $_args[0] '--version') (==s $_args[0] '-v'))  {
              e:goto --version
         } elif (==s $_args[0] '-') {
             dir:cd -
