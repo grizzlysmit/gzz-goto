@@ -1,9 +1,9 @@
 {
     "comment": "new version of GOTO",
-    "separate-markdown-files": true,
+    "separate-markdown-files": false,
     "markdown-path": "README.md",
     "bin": "bin",
-    "only-app": false,
+    "only-app": true,
     "docs": "docs",
     "name": "paths",
     "lib": "rakulib",
