@@ -1,1 +1,1 @@
-bash_aliases.rakudoc
+doc/bash_aliases.rakudoc

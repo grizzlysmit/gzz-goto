@@ -1,1 +1,1 @@
-gt.rakudoc
+doc/gt.rakudoc
