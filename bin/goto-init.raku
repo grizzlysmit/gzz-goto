@@ -6,6 +6,10 @@
 ##############################################################
 
 
+my %*SUB-MAIN-OPTS;
+%*SUB-MAIN-OPTS«named-anywhere» = True;
+#%*SUB-MAIN-OPTS<bundling>       = True;
+
 my $bash = q:to/ENDBASH/;
 if [ -n "$RAKULIB" ]
 then
