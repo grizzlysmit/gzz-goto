@@ -168,8 +168,10 @@ fn g {|@_args|
 }
 ENDELVISH
 
-multi sub MAIN(Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D :n(:nocolor(:$nocolour)) = False, *%named-args, *@args --> int){
+multi sub MAIN(Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D :n(:nocolor(:$nocolour)) = False --> int){
     if $help {
+        my %named-args;
+        my @args;
         say-coloured($*USAGE, $nocolour, |%named-args, |@args);
         exit 0;
     }
@@ -177,13 +179,17 @@ multi sub MAIN(Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D :
         say version();
         exit 0;
     } else {
+        my %named-args;
+        my @args;
         say-coloured($*USAGE, $nocolour, %named-args, @args);
         exit 0;
     }
 }
 
-multi sub MAIN('bash', Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D :n(:nocolor(:$nocolour)) = False, *%named-args, *@args --> Int:D){
+multi sub MAIN('bash', Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D :n(:nocolor(:$nocolour)) = False --> Int:D){
     if $help {
+        my %named-args;
+        my @args;
         say-coloured($*USAGE, $nocolour, |%named-args, |@args);
         exit 0;
     }
@@ -195,8 +201,10 @@ multi sub MAIN('bash', Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, 
     exit 0;
 }
 
-multi sub MAIN('elvish', Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D :n(:nocolor(:$nocolour)) = False, *%named-args, *@args --> Int:D){
+multi sub MAIN('elvish', Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D :n(:nocolor(:$nocolour)) = False --> Int:D){
     if $help {
+        my %named-args;
+        my @args;
         say-coloured($*USAGE, $nocolour, |%named-args, |@args);
         exit 0;
     }
@@ -209,8 +217,10 @@ multi sub MAIN('elvish', Bool:D :v(:$version) = False, Bool:D :h(:$help) = False
 }
 
 multi sub MAIN('init', Str:D :$shell = 'bash', Str:D :$config is copy = '',
-                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D :n(:nocolor(:$nocolour)) = False, *%named-args, *@args --> Int){
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D :n(:nocolor(:$nocolour)) = False --> Int){
     if $help {
+        my %named-args;
+        my @args;
         say-coloured($*USAGE, $nocolour, |%named-args, |@args);
         exit 0;
     }
