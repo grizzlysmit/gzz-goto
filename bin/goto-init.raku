@@ -164,7 +164,8 @@ multi sub MAIN('init', Str:D :$shell = 'bash', Str:D :$config = '' --> Int){
             "$home/$config".IO.spurt(qq[eval "\n\$($path bash)\n"], :append);
         }
         when 'elv'|'elvish'  {
-            $config = ".config/elvish/rc.elv" if $config eq '';
+            my Str:D $conf = %*ENV«XDG_DATA_HOME».Str // '.local/share';
+            $config = "$conf/elvish/rc.elv" if $config eq '';
             my $path = qx[which goto-init.raku];
             "$home/$config".IO.spurt(qq[eval "\n\$($path bash)\n"], :append);
         }
