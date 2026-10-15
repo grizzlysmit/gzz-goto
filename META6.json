@@ -24,8 +24,6 @@
   }, 
   "bin": {
     "paths.raku":     "bin/paths.raku",
-    "goto":           "bin/goto",
-    "g":              "bin/g",
     "=begin":         "bin/=begin",
     "=end":           "bin/=end",
     "goto-init.raku": "bin/goto-init.raku"
@@ -48,5 +46,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.1.43"
+  "version": "0.1.44"
 }

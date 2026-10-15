@@ -33,11 +33,11 @@ Table of Contents
 
 =end pod
 
-my Version:D $version = v0.1.43;
+my Version:D $version = v0.1.44;
 
 =begin pod
 
-=VERSION v0.1.43
+=VERSION v0.1.44
 =TITLE goto
 =SUBTITLE GOTO is a cd alternative that acts like a database of bookmarks to different places in the directory tree.
 
