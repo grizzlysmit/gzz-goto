@@ -6,10 +6,10 @@ class Build {
         # which is located at $dist-path
         dd %?RESOURCES;
         my Str:D $path = "/usr/lib/perl6/site/bin";
-        my Proc $r = run 'cd', "$path";
-        $r = run 'ln', '-s', "paths.raku", "goto";
+        chdir($path.IO);
+        my Proc $r = run 'ln', '-s', "paths.raku", "goto";
         $r = run 'ln', '-s', "paths.raku", "g";
-        $r = run 'cd', "/usr/local/bin/";
+        chdir("/usr/local/bin/");
         $r = run 'ln', '-s', "$path/paths.raku",     "paths.raku";
         $r = run 'ln', '-s', "$path/goto",           "goto";
         $r = run 'ln', '-s', "$path/g",              "g";
