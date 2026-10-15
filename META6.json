@@ -23,11 +23,12 @@
   "provides": {
   }, 
   "bin": {
-    "paths.raku": "bin/paths.raku",
-    "goto":       "bin/goto",
-    "g":          "bin/g",
-    "=begin":     "bin/=begin",
-    "=end":       "bin/=end"
+    "paths.raku":     "bin/paths.raku",
+    "goto":           "bin/goto",
+    "g":              "bin/g",
+    "=begin":         "bin/=begin",
+    "=end":           "bin/=end",
+    "goto-init.raku": "bin/goto-init.raku"
   },
   "source-url": "https://github.com/grizzlysmit/gzz-goto.git",
   "support": {
@@ -47,5 +48,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.1.42"
+  "version": "0.1.43"
 }
