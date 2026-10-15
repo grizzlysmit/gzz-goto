@@ -161,13 +161,13 @@ multi sub MAIN('init', Str:D :$shell = 'bash', Str:D :$config is copy = '' --> I
         when 'bash' {
             $config = ".bashrc" if $config eq '';
             my $path = qx[which goto-init.raku];
-            "$home/$config".IO.spurt(qq[eval "\n\$($path bash)\n"], :append);
+            "$home/$config".IO.spurt(qq[\neval "\$($path bash)"\n], :append);
         }
         when 'elv'|'elvish'  {
             my Str:D $conf = %*ENV«XDG_DATA_HOME».Str // '.local/share';
             $config = "$conf/elvish/rc.elv" if $config eq '';
             my $path = qx[which goto-init.raku];
-            "$home/$config".IO.spurt(qq[eval "\n\$($path bash)\n"], :append);
+            "$home/$config".IO.spurt(qq[\neval "\$($path bash)"\n], :append);
         }
     }
 }
