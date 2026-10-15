@@ -24,8 +24,6 @@
   }, 
   "bin": {
     "paths.raku":     "bin/paths.raku",
-    "=begin":         "bin/=begin",
-    "=end":           "bin/=end",
     "goto-init.raku": "bin/goto-init.raku"
   },
   "source-url": "https://github.com/grizzlysmit/gzz-goto.git",
