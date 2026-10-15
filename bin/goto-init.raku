@@ -168,7 +168,7 @@ fn g {|@_args|
 }
 ENDELVISH
 
-multi sub MAIN(Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D $nocolour = False, *%named-args, *@args --> int){
+multi sub MAIN(Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D :n(:nocolor(:$nocolour)) = False, *%named-args, *@args --> int){
     if $help {
         say-coloured($*USAGE, $nocolour, |%named-args, |@args);
         exit 0;
@@ -182,7 +182,7 @@ multi sub MAIN(Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D $
     }
 }
 
-multi sub MAIN('bash', Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D $nocolour = False, *%named-args, *@args --> Int:D){
+multi sub MAIN('bash', Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D :n(:nocolor(:$nocolour)) = False, *%named-args, *@args --> Int:D){
     if $help {
         say-coloured($*USAGE, $nocolour, |%named-args, |@args);
         exit 0;
@@ -195,7 +195,7 @@ multi sub MAIN('bash', Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, 
     exit 0;
 }
 
-multi sub MAIN('elvish', Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D $nocolour = False, *%named-args, *@args --> Int:D){
+multi sub MAIN('elvish', Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D :n(:nocolor(:$nocolour)) = False, *%named-args, *@args --> Int:D){
     if $help {
         say-coloured($*USAGE, $nocolour, |%named-args, |@args);
         exit 0;
@@ -209,7 +209,7 @@ multi sub MAIN('elvish', Bool:D :v(:$version) = False, Bool:D :h(:$help) = False
 }
 
 multi sub MAIN('init', Str:D :$shell = 'bash', Str:D :$config is copy = '',
-                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D $nocolour = False, *%named-args, *@args --> Int){
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D :n(:nocolor(:$nocolour)) = False, *%named-args, *@args --> Int){
     if $help {
         say-coloured($*USAGE, $nocolour, |%named-args, |@args);
         exit 0;
@@ -247,7 +247,7 @@ multi sub MAIN('init', Str:D :$shell = 'bash', Str:D :$config is copy = '',
 #»»»
 
 sub USAGE(Bool:D :n(:nocolor(:$nocolour)) = False, *%named-args, *@args --> Int) {
-    say-coloured($*USAGE, False, %named-args, @args);
+    say-coloured($*USAGE, $nocolour, %named-args, @args);
     exit 0;
 }
 
