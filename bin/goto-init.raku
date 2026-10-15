@@ -155,7 +155,7 @@ multi sub MAIN('elvish', --> Int:D){
     exit 0;
 }
 
-multi sub MAIN('init', Str:D :$shell = 'bash', Str:D :$config = '' --> Int){
+multi sub MAIN('init', Str:D :$shell = 'bash', Str:D :$config is copy = '' --> Int){
     my Str:D $home = %*ENV«HOME».Str;
     given $shell {
         when 'bash' {
