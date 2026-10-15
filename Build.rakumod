@@ -7,12 +7,13 @@ class Build {
         dd %?RESOURCES;
         my Str:D $path = "/usr/lib/perl6/site/bin";
         chdir($path.IO);
-        my Proc $r = run 'ln', '-s', "paths.raku", "goto";
-        $r = run 'ln', '-s', "paths.raku", "g";
-        chdir("/usr/local/bin/");
-        $r = run 'ln', '-s', "$path/paths.raku",     "paths.raku";
-        $r = run 'ln', '-s', "$path/goto",           "goto";
-        $r = run 'ln', '-s', "$path/g",              "g";
-        $r = run 'ln', '-s', "$path/goto-init.raku", "goto-init.raku";
+        my Proc $r = run 'ln', '-s', "paths.raku",           "goto";
+        $r = run         'ln', '-s', "paths.raku",           "g";
+        $r = run         'ln', '-s', "goto-init.raku",       "goto-init";
+        chdir("/usr/local/bin/".IO);
+        $r = run         'ln', '-s', "$path/paths.raku",     "paths.raku";
+        $r = run         'ln', '-s', "$path/goto",           "goto";
+        $r = run         'ln', '-s', "$path/g",              "g";
+        $r = run         'ln', '-s', "$path/goto-init.raku", "goto-init.raku";
     }
 }
