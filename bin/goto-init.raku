@@ -156,7 +156,7 @@ multi sub MAIN('elvish', --> Int:D){
 }
 
 multi sub MAIN('init', Str:D :$shell = 'bash', Str:D :$config = '' --> Int){
-    my Str:D $home = $*ENV«HOME».Str;
+    my Str:D $home = %*ENV«HOME».Str;
     given $shell {
         when 'bash' {
             $config = ".bashrc" if $config eq '';
