@@ -1,14 +1,63 @@
-## vim: :set filetype=raku :autoindent #
+#!/usr/bin/env raku
 ##############################################################
 #                                                            #
 # goto function makes getting places in the file system easy #
 #                                                            #
 ##############################################################
 
+use Usage::Utils;
 
 my %*SUB-MAIN-OPTS;
 %*SUB-MAIN-OPTS«named-anywhere» = True;
 #%*SUB-MAIN-OPTS<bundling>       = True;
+
+=begin pod
+
+=begin head2
+
+Table of Contents
+
+=end head2
+
+=item1 L<NAME|#name>
+=item1 L<AUTHOR|#author>
+=item1 L<VERSION|#version>
+=item1 L<TITLE|#title>
+=item1 L<SUBTITLE|#subtitle>
+=item1 L<COPYRIGHT|#copyright>
+=item1 L<Introduction|#introduction>
+
+=NAME goto-init.raku 
+=AUTHOR Francis Grizzly Smit (grizzly@smit.id.au)
+
+=end pod
+
+my Version:D $version = v0.1.60;
+
+=begin pod
+
+=VERSION v0.1.60
+=TITLE goto-init
+=SUBTITLE GOTO is a cd alternative that acts like a database of bookmarks to different places in the directory tree. This is the init program for goto.
+
+
+=COPYRIGHT
+LGPL V3.0+ L<LICENSE|https://github.com/grizzlysmit/gzz-goto/gt/blob/main/LICENSE>
+
+
+L<Top of Document|#table-of-contents>
+
+=head1 Introduction
+
+This is the init program for GOTO is a mixture of a Raku app path.raku and a module Paths.rakumod  that implements it and a set of script to apply them inside a shell instance This is important as you need the scripts to call cd from within the shell process in order to actually change it's current directory otherwise we would only change a subprocesses current directory and then nothing would have been achieved on exit.  The scripts are .goto_bash_aliases -> /home/grizzlysmit/Projects/elvish/gzz-goto/bash_aliases in bash and the combination of some lines in your rc.elv file and a elevish module gt.elv.
+
+L<See gzz-goto/gt|https://github.com/grizzlysmit/gzz-goto/gt>.
+
+=end pod
+
+sub version(--> Version:D){
+    return $version;
+}
 
 my $bash = q:to/ENDBASH/;
 if [ -n "$RAKULIB" ]
@@ -106,70 +155,119 @@ function g(){
 ENDBASH
 
 my $elvish = q:to/ENDELVISH/;
-use str
-use re
-use github.com/zzamboni/elvish-modules/dir
-use os
-fn goto {| @_args | 
-    if (== (count $_args) 0) {
-        dir:cd 
-        e:exa -F -laahigHb  --colour-scale --time-style=full-iso --icons=always
-    } elif (== (count $_args) 1) {
-        if (==s $_args[0] '--help') {
-             e:goto --help
-        } elif (or (==s $_args[0] '--version') (==s $_args[0] '-v'))  {
-             e:goto --version
-        } elif (==s $_args[0] '-') {
-            dir:cd -
-            e:exa -F -laahigHb  --colour-scale --time-style=full-iso --icons=always
-        } else {
-             var res = (e:goto $_args[0])
-             if (==s $res '') {
-                if (os:is-dir &follow-symlink=$true $_args[0]) {
-                    cd $_args[0]
-                    e:exa -F -laahigHb  --colour-scale --time-style=full-iso --icons=always
-                } else {
-                    echo "error: "$_args[0]" not found"
-                }
-             } else {
-                dir:cd $res
-                e:exa -F -laahigHb  --color-scale --time-style=full-iso --icons=always
-             }
-        }
-    } else {
-        e:goto $@_args
-    }
+epm:install &silent-if-installed github.com/grizzlysmit/gzz-goto        
+
+use github.com/grizzlysmit/gzz-goto/gt
+
+fn goto {|@_args|
+    gt:goto $@_args
 }
-fn g {| @_args |
-  goto $@_args
+
+fn g {|@_args|
+    gt:g $@_args
 }
 ENDELVISH
 
-multi sub MAIN('bash', --> Int:D){
+multi sub MAIN(Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D $nocolour = False, *%named-args, *@args --> int){
+    if $help {
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    } else {
+        say-coloured($*USAGE, $nocolour, %named-args, @args);
+        exit 0;
+    }
+}
+
+multi sub MAIN('bash', Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D $nocolour = False, *%named-args, *@args --> Int:D){
+    if $help {
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     $bash.say;
     exit 0;
 }
 
-multi sub MAIN('elvish', --> Int:D){
+multi sub MAIN('elvish', Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D $nocolour = False, *%named-args, *@args --> Int:D){
+    if $help {
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     $elvish.say;
     exit 0;
 }
 
-multi sub MAIN('init', Str:D :$shell = 'bash', Str:D :$config is copy = '' --> Int){
+multi sub MAIN('init', Str:D :$shell = 'bash', Str:D :$config is copy = '',
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D $nocolour = False, *%named-args, *@args --> Int){
+    if $help {
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     my Str:D $home = %*ENV«HOME».Str;
     given $shell {
         when 'bash' {
             $config = ".bashrc" if $config eq '';
             my $path = qx[which goto-init.raku];
-            "$home/$config".IO.spurt(qq[\neval "\$($path bash)"\n], :append);
+            if $config.IO.is-relative {
+                "$home/$config".IO.spurt(qq[\neval "\$($path bash)"\n], :append);
+            } else {
+                "$config".IO.spurt(qq[\neval "\$($path bash)"\n], :append);
+            }
         }
         when 'elv'|'elvish'  {
-            my Str:D $conf = %*ENV«XDG_DATA_HOME».Str // '.local/share';
+            my Str:D $conf = %*ENV«XDG_DATA_HOME».Str // "$home/.local/share";
             $config = "$conf/elvish/rc.elv" if $config eq '';
             my $path = qx[which goto-init.raku];
-            "$home/$config".IO.spurt(qq[\neval "\$($path bash)"\n], :append);
+            "$config".IO.spurt(qq[\n\$($path elvish)\n], :append);
         }
     }
+}
+
+#`«««
+    ***********************************************************
+    *                                                         *
+    *                       USAGE Stuff                       *
+    *                                                         *
+    ***********************************************************
+#»»»
+
+sub USAGE(Bool:D :n(:nocolor(:$nocolour)) = False, *%named-args, *@args --> Int) {
+    say-coloured($*USAGE, False, %named-args, @args);
+    exit 0;
+}
+
+multi sub GENERATE-USAGE(&main, |capture --> Int) {
+    my @capture = |(capture.list);
+    my @_capture;
+    if @capture && @capture[0] eq 'help' {
+        @_capture = |@capture[1 .. *];
+    } else {
+        @_capture = |@capture;
+    }
+    my %capture = |(capture.hash);
+    if %capture«nocolour» || %capture«nocolor» || %capture«n» {
+        say-coloured($*USAGE, True, |%capture, |@_capture);
+    } else {
+        #dd @capture;
+        say-coloured($*USAGE, False, |%capture, |@_capture);
+        #&*GENERATE-USAGE(&main, |capture)
+    }
+    exit 0;
 }
 
 ## vim: :set filetype=sh :autoindent #
