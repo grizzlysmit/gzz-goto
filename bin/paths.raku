@@ -33,27 +33,13 @@ Table of Contents
 
 =end pod
 
-my Version:D $version = v0.1.67;
+my Version:D $version = v0.1.68;
 
 =begin pod
 
-=VERSION v0.1.67
+=VERSION v0.1.68
 =TITLE goto
 =SUBTITLE GOTO is a cd alternative that acts like a database of bookmarks to different places in the directory tree.
-
-=begin code :lang<elvish>
-
-use github.com/grizzlysmit/gzz-goto/gt
-fn goto {|@_args|
-    gt:goto $@_args
-}
-
-fn g {|@_args|
-    gt:g $@_args
-}
-
-=end code
-
 
 =COPYRIGHT
 LGPL V3.0+ L<LICENSE|https://github.com/grizzlysmit/gzz-goto/gt/blob/main/LICENSE>

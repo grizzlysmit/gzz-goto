@@ -28,7 +28,7 @@ Francis Grizzly Smit (grizzly@smit.id.au)
 VERSION
 =======
 
-v0.1.67
+v0.1.68
 
 TITLE
 =====
@@ -39,17 +39,6 @@ SUBTITLE
 ========
 
 GOTO is a cd alternative that acts like a database of bookmarks to different places in the directory tree.
-
-```elvish
-use github.com/grizzlysmit/gzz-goto/gt
-fn goto {|@_args|
-    gt:goto $@_args
-}
-
-fn g {|@_args|
-    gt:g $@_args
-}
-```
 
 COPYRIGHT
 =========

@@ -400,16 +400,6 @@ hr {
 <li><p><a href="#introduction">Introduction</a></p>
 </li>
 </ul>
-<pre class="pod-block-code">use github.com/grizzlysmit/gzz-goto/gt
-fn goto {|@_args|
-    gt:goto $@_args
-}
-
-fn g {|@_args|
-    gt:g $@_args
-}
-
-</pre>
 <p><a href="#table-of-contents">Top of Document</a></p>
 <h1 id="Introduction"><a class="u" href="#___top" title="go to top of document">Introduction</a></h1>
 <p>GOTO is a mixture of a Raku app path.raku and a module Paths.rakumod (implemented separately) that implements it and a set of scripts to apply them inside a shell instance This is important as you need the scripts to call cd from within the shell process in order to actually change it&#39;s current directory otherwise we would only change a subprocesses current directory and then nothing would have been achieved on exit. The scripts are applied by running goto-init init [--shell=SHELL] [--config=CONFIG-FILE].</p>
