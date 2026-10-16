@@ -33,11 +33,11 @@ Table of Contents
 
 =end pod
 
-my Version:D $version = v0.1.68;
+my Version:D $version = v0.1.69;
 
 =begin pod
 
-=VERSION v0.1.68
+=VERSION v0.1.69
 =TITLE goto
 =SUBTITLE GOTO is a cd alternative that acts like a database of bookmarks to different places in the directory tree.
 
@@ -202,17 +202,34 @@ sub version(--> Version:D){
     return $version;
 }
 
-multi sub MAIN(Bool:D :v(:$version) = False, *%named-args, *@args --> int){
+multi sub MAIN(Bool:D :v(:$version) = False,
+                    Bool:D :h(:$help) = False, Bool:D :n(:nocolor(:$nocolour)) = False --> int){
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
     if $version {
         say version();
         exit 0;
     } else {
+        my %named-args;
+        my @args;
         say-coloured($*USAGE, False, %named-args, @args);
         exit 0;
     }
 }
 
-multi sub MAIN(Str:D $key, Bool:D :v(:$version) = False --> int){
+multi sub MAIN(Str:D $key, Bool:D :v(:$version) = False,
+                                            Bool:D :h(:$help) = False,
+                                            Bool:D :n(:nocolor(:$nocolour)) = False --> int){
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
     if $version {
         say version();
         exit 0;
@@ -221,7 +238,20 @@ multi sub MAIN(Str:D $key, Bool:D :v(:$version) = False --> int){
     return 0;
 }
 
-multi sub MAIN('edit', 'configs') returns Int {
+multi sub MAIN('edit', 'configs',
+                    Bool:D :v(:$version) = False,
+                    Bool:D :h(:$help) = False,
+                    Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
    if edit-configs() {
        exit 0;
    } else {
@@ -234,7 +264,19 @@ multi sub MAIN('list', 'keys', Str $prefix = '',
                                Bool:D :s(:$syntax) = False,
                                Int:D :l(:$page-length) = 50,
                                Str :p(:$pattern) = Str,
-                               Str :e(:$ecma-pattern) = Str) returns Int {
+                               Str :e(:$ecma-pattern) = Str,
+                               Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                               Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     my Regex $_pattern;
     with $pattern {
         $_pattern = rx:i/ <$pattern> /;
@@ -252,7 +294,19 @@ multi sub MAIN('list', 'keys', Str $prefix = '',
 
 multi sub MAIN('list', 'all', Str:D $prefix = '', Bool:D :c(:color(:$colour)) = False,
                     Bool:D :s(:$syntax) = False, Int:D :l(:$page-length) = 50, Str :p(:$pattern) = Str,
-                                                                Str :e(:$ecma-pattern) = Str) returns Int {
+                                                                Str :e(:$ecma-pattern) = Str,
+                                                                Bool:D :n(:nocolor(:$nocolour)) = False,
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     my Regex $_pattern;
     with $pattern {
         $_pattern = rx:i/ <$pattern> /;
@@ -270,7 +324,19 @@ multi sub MAIN('list', 'all', Str:D $prefix = '', Bool:D :c(:color(:$colour)) = 
                     Bool:D :s(:$syntax) = False, Int:D :l(:$page-length) = 50, Str :p(:$pattern) = Str,
                                                                 Str :e(:$ecma-pattern) = Str) returns Int »»»
 
-multi sub MAIN('add', Str:D $key, Str:D $path, Bool:D :s(:set(:$force)) = False, Str :c(:$comment) = Str) returns Int {
+multi sub MAIN('add', Str:D $key, Str:D $path, Bool:D :s(:set(:$force)) = False, Str :c(:$comment) = Str,
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                    Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
    if add-path($key, $path, $force, $comment) {
        exit 0;
    } else {
@@ -278,7 +344,19 @@ multi sub MAIN('add', Str:D $key, Str:D $path, Bool:D :s(:set(:$force)) = False,
    } 
 }
 
-multi sub MAIN('delete', Bool:D :d(:delete(:$do-not-trash)) = False, *@keys) returns Int {
+multi sub MAIN('delete', Bool:D :d(:delete(:$do-not-trash)) = False, *@keys,
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                    Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     my Int:D $result = 0;
     for @keys -> $key {
         unless delete-key($key, !$do-not-trash) {
@@ -288,7 +366,19 @@ multi sub MAIN('delete', Bool:D :d(:delete(:$do-not-trash)) = False, *@keys) ret
     exit $result;
 }
 
-multi sub MAIN('del', Bool:D :d(:delete(:$do-not-trash)) = False, *@keys) returns Int {
+multi sub MAIN('del', Bool:D :d(:delete(:$do-not-trash)) = False, *@keys,
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                    Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     my Int:D $result = 0;
     for @keys -> $key {
         unless delete-key($key, !$do-not-trash) {
@@ -298,7 +388,19 @@ multi sub MAIN('del', Bool:D :d(:delete(:$do-not-trash)) = False, *@keys) return
     exit $result;
 }
 
-multi sub MAIN('trash', *@keys) returns Int {
+multi sub MAIN('trash', *@keys,
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                    Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     my Int:D $result = 0;
     for @keys -> $key {
         unless delete-key($key, True) {
@@ -308,7 +410,19 @@ multi sub MAIN('trash', *@keys) returns Int {
     exit $result;
 }
 
-multi sub MAIN('tidy', 'file') returns Int {
+multi sub MAIN('tidy', 'file',
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                    Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
    if tidy-file() {
        exit 0;
    } else {
@@ -316,7 +430,20 @@ multi sub MAIN('tidy', 'file') returns Int {
    } 
 }
 
-multi sub MAIN('alias', Str:D $key, Str:D $target, Bool:D :s(:set(:$force)) = False, Bool:D :d(:really-force(:$overwrite-dirs)) = False, Str :c(:$comment) = Str) returns Int {
+multi sub MAIN('alias', Str:D $key, Str:D $target, Bool:D :s(:set(:$force)) = False,
+                    Bool:D :d(:really-force(:$overwrite-dirs)) = False, Str :c(:$comment) = Str,
+                                Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                                Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
    if add-alias($key, $target, $force, $overwrite-dirs, $comment) {
        exit 0;
    } else {
@@ -324,12 +451,23 @@ multi sub MAIN('alias', Str:D $key, Str:D $target, Bool:D :s(:set(:$force)) = Fa
    } 
 }
 
-multi sub MAIN('comment', Str:D $key, Str:D $comment) returns Int {
-   if add-comment($key, $comment) {
-       exit 0;
-   } else {
-       exit 1;
-   } 
+multi sub MAIN('comment', Str:D $key, Str:D $comment,
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False, Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
+    if add-comment($key, $comment) {
+        exit 0;
+    } else {
+        exit 1;
+    } 
 }
 
 multi sub MAIN('list', 'trash', Str:D $prefix = '',
@@ -337,7 +475,20 @@ multi sub MAIN('list', 'trash', Str:D $prefix = '',
                                Bool:D :s(:$syntax) = False,
                                Int:D :l(:$page-length) = 30,
                                Str :p(:$pattern) = Str,
-                               Str :e(:$ecma-pattern) = Str) returns Int {
+                               Str :e(:$ecma-pattern) = Str,
+                               Bool:D :v(:$version) = False,
+                               Bool:D :h(:$help) = False,
+                               Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     my Regex $_pattern;
     with $pattern {
         $_pattern = rx:i/ <$pattern> /;
@@ -353,15 +504,39 @@ multi sub MAIN('list', 'trash', Str:D $prefix = '',
    } 
 }
 
-multi sub MAIN('empty', 'trash') returns Int {
-   if empty-trash() {
-       exit 0;
-   } else {
-       exit 1;
-   } 
+multi sub MAIN('empty', 'trash',
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                    Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
+    if empty-trash() {
+        exit 0;
+    } else {
+        exit 1;
+    } 
 }
 
-multi sub MAIN('undelete', *@keys) returns Int {
+multi sub MAIN('undelete', *@keys,
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                    Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     my Int:D $result = 0;
     for @keys -> $key {
         unless undelete($key) {
@@ -375,7 +550,20 @@ multi sub MAIN('show', 'stats', Str:D $prefix = '',
                                Bool:D :c(:color(:$colour)) = False,
                                Bool:D :s(:$syntax) = False,
                                Str :p(:$pattern) = Str,
-                               Str :e(:$ecma-pattern) = Str) returns Int {
+                               Str :e(:$ecma-pattern) = Str,
+                               Bool:D :v(:$version) = False,
+                               Bool:D :h(:$help) = False,
+                               Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     my Regex $_pattern;
     with $pattern {
         $_pattern = rx:i/ <$pattern> /;
@@ -395,7 +583,20 @@ multi sub MAIN('show', 'statistics', Str:D $prefix = '',
                                Bool:D :c(:color(:$colour)) = False,
                                Bool:D :s(:$syntax) = False,
                                Str :p(:$pattern) = Str,
-                               Str :e(:$ecma-pattern) = Str) returns Int {
+                               Str :e(:$ecma-pattern) = Str,
+                               Bool:D :v(:$version) = False,
+                               Bool:D :h(:$help) = False,
+                               Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     my Regex $_pattern;
     with $pattern {
         $_pattern = rx:i/ <$pattern> /;
@@ -411,7 +612,19 @@ multi sub MAIN('show', 'statistics', Str:D $prefix = '',
     } 
 } # multi sub MAIN('statistics', Bool:D :c(:color(:$colour)) = False, Bool:D :s(:$syntax) = False) returns Int #
 
-multi sub MAIN('backup', 'db', Bool:D :w(:win-format(:$use-windows-formating)) = False --> Bool) {
+multi sub MAIN('backup', 'db', Bool:D :w(:win-format(:$use-windows-formating)) = False,
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                    Bool:D :n(:nocolor(:$nocolour)) = False --> Bool) {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     if backup-db-file($use-windows-formating) {
         exit 0;
     } else {
@@ -419,7 +632,19 @@ multi sub MAIN('backup', 'db', Bool:D :w(:win-format(:$use-windows-formating)) =
     }
 }
 
-multi sub MAIN('restore', 'db', Str $restore-from = Str --> Bool) {
+multi sub MAIN('restore', 'db', Str $restore-from = Str,
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                    Bool:D :n(:nocolor(:$nocolour)) = False --> Bool) {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     my IO::Path $_restore-from;
     with $restore-from {
         $_restore-from = $restore-from.IO;
@@ -434,7 +659,19 @@ multi sub MAIN('restore', 'db', Str $restore-from = Str --> Bool) {
 multi sub MAIN('menu', 'restore', 'db',
                 Str:D $message = '',
                 Bool:D :c(:color(:$colour)) = False,
-                Bool:D :s(:$syntax) = False) returns Int {
+                Bool:D :s(:$syntax) = False,
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                    Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
    if backups-menu-restore-db($colour, $syntax, $message) {
        exit 0;
    } else {
@@ -447,7 +684,20 @@ multi sub MAIN('list', 'db', 'backups', Str:D $prefix = '',
                                Bool:D :s(:$syntax) = False,
                                Int:D :l(:$page-length) = 30,
                                Str :p(:$pattern) = Str,
-                               Str :e(:$ecma-pattern) = Str) returns Int {
+                               Str :e(:$ecma-pattern) = Str,
+                               Bool:D :v(:$version) = False,
+                               Bool:D :h(:$help) = False,
+                               Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     my Regex $_pattern;
     with $pattern {
         $_pattern = rx:i/ <$pattern> /;
@@ -478,7 +728,20 @@ multi sub MAIN('list', 'editors', Str:D :f(:$prefix) = '',
                                Bool:D :s(:$syntax) = False,
                                Int:D :l(:$page-length) = 30,
                                Str :p(:$pattern) = Str,
-                               Str :e(:$ecma-pattern) = Str) returns Int {
+                               Str :e(:$ecma-pattern) = Str,
+                               Bool:D :v(:$version) = False,
+                               Bool:D :h(:$help) = False,
+                               Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     my Regex $_pattern;
     with $pattern {
         $_pattern = rx:i/ <$pattern> /;
@@ -499,7 +762,20 @@ multi sub MAIN('editors', 'stats', Str:D $prefix = '',
                                Bool:D :s(:$syntax) = False,
                                Int:D :l(:$page-length) = 30,
                                Str :p(:$pattern) = Str,
-                               Str :e(:$ecma-pattern) = Str) returns Int {
+                               Str :e(:$ecma-pattern) = Str,
+                               Bool:D :v(:$version) = False,
+                               Bool:D :h(:$help) = False,
+                               Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     my Regex $_pattern;
     with $pattern {
         $_pattern = rx:i/ <$pattern> /;
@@ -508,11 +784,11 @@ multi sub MAIN('editors', 'stats', Str:D $prefix = '',
     } else {
         $_pattern = rx:i/^ .* $/;
     }
-   if editors-stats($prefix, $colour, $syntax, $page-length, $_pattern) {
-       exit 0;
-   } else {
-       exit 1;
-   } 
+    if editors-stats($prefix, $colour, $syntax, $page-length, $_pattern) {
+        exit 0;
+    } else {
+        exit 1;
+    } 
 }
 
 multi sub MAIN('list', 'editors', 'backups', Str:D $prefix = '',
@@ -520,7 +796,20 @@ multi sub MAIN('list', 'editors', 'backups', Str:D $prefix = '',
                                Bool:D :s(:$syntax) = False,
                                Int:D :l(:$page-length) = 30,
                                Str :p(:$pattern) = Str,
-                               Str :e(:$ecma-pattern) = Str) returns Int {
+                               Str :e(:$ecma-pattern) = Str,
+                               Bool:D :v(:$version) = False,
+                               Bool:D :h(:$help) = False,
+                               Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     my Regex $_pattern;
     with $pattern {
         $_pattern = rx:i/ <$pattern> /;
@@ -536,15 +825,39 @@ multi sub MAIN('list', 'editors', 'backups', Str:D $prefix = '',
     } 
 }
 
-multi sub MAIN('backup', 'editors', Bool:D :w(:$use-windows-formatting) = False) returns Int {
-   if backup-editors($use-windows-formatting) {
-       exit 0;
-   } else {
-       exit 1;
-   } 
+multi sub MAIN('backup', 'editors', Bool:D :w(:$use-windows-formatting) = False,
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                    Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
+    if backup-editors($use-windows-formatting) {
+        exit 0;
+    } else {
+        exit 1;
+    } 
 }
 
-multi sub MAIN('restore', 'editors', Str:D $restore-from) returns Int {
+multi sub MAIN('restore', 'editors', Str:D $restore-from,
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                    Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
    if restore-editors($restore-from.IO) {
        exit 0;
    } else {
@@ -552,7 +865,19 @@ multi sub MAIN('restore', 'editors', Str:D $restore-from) returns Int {
    } 
 }
 
-multi sub MAIN('set', 'editor', Str:D $editor, Str $comment = Str) returns Int {
+multi sub MAIN('set', 'editor', Str:D $editor, Str $comment = Str,
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                    Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
    if set-editor($editor, $comment) {
        exit 0;
    } else {
@@ -560,20 +885,45 @@ multi sub MAIN('set', 'editor', Str:D $editor, Str $comment = Str) returns Int {
    } 
 }
 
-multi sub MAIN('set', 'override', 'GUI_EDITOR', Bool:D $value, Str $comment = Str) returns Int {
-   if set-override-GUI_EDITOR($value, $comment) {
-       exit 0;
-   } else {
-       exit 1;
-   } 
+multi sub MAIN('set', 'override', 'GUI_EDITOR', Bool:D $value, Str $comment = Str,
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                    Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
+    if set-override-GUI_EDITOR($value, $comment) {
+        exit 0;
+    } else {
+        exit 1;
+    } 
 }
 
-multi sub MAIN('menu', 'restore', 'editors', Str:D $message = '', Bool:D :c(:color(:$colour)) = False, Bool:D :s(:$syntax) = False) returns Int {
-   if backups-menu-restore-editors($colour, $syntax, $message) {
-       exit 0;
-   } else {
-       exit 1;
-   } 
+multi sub MAIN('menu', 'restore', 'editors', Str:D $message = '',
+                    Bool:D :c(:color(:$colour)) = False, Bool:D :s(:$syntax) = False,
+                    Bool:D :v(:$version) = False, Bool:D :h(:$help) = False,
+                    Bool:D :n(:nocolor(:$nocolour)) = False) returns Int {
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
+    if backups-menu-restore-editors($colour, $syntax, $message) {
+        exit 0;
+    } else {
+        exit 1;
+    } 
 }
 
 #`«««
