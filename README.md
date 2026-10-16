@@ -28,7 +28,7 @@ Francis Grizzly Smit (grizzly@smit.id.au)
 VERSION
 =======
 
-v0.1.65
+v0.1.66
 
 TITLE
 =====
@@ -61,7 +61,21 @@ LGPL V3.0+ [LICENSE](https://github.com/grizzlysmit/gzz-goto/gt/blob/main/LICENS
 Introduction
 ============
 
-GOTO is a mixture of a Raku app path.raku and a module Paths.rakumod that implements it and a set of script to apply them inside a shell instance This is important as you need the scripts to call cd from within the shell process in order to actually change it's current directory otherwise we would only change a subprocesses current directory and then nothing would have been achieved on exit. The scripts are .goto_bash_aliases -> /home/grizzlysmit/Projects/elvish/gzz-goto/bash_aliases in bash and the combination of some lines in your rc.elv file and a elevish module gt.elv.
+GOTO is a mixture of a Raku app path.raku and a module Paths.rakumod (implemented separately) that implements it and a set of scripts to apply them inside a shell instance This is important as you need the scripts to call cd from within the shell process in order to actually change it's current directory otherwise we would only change a subprocesses current directory and then nothing would have been achieved on exit. The scripts are applied by running goto-init init [--shell=SHELL] [--config=CONFIG-FILE].
+
+run
+
+```bash
+$  goto init --shell=SHELL --config=CONFIGFILE
+```
+
+where
+
+  * --shell=SHELL defaults to bash and 
+
+  * --config=CONFIG defults to ~/.bashrc for bash and either ~/.local/share/elvish/rc.elv or $XDG_DATA_HOME/elvish/rc.elv if XDG_DATA_HOME is set in your environment
+
+**NB:** no other shells are supported at this time.
 
 [See gzz-goto/gt](https://github.com/grizzlysmit/gzz-goto/gt).
 

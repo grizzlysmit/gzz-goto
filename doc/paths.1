@@ -36,7 +36,7 @@ goto
 .SH "AUTHOR"
 Francis Grizzly Smit (grizzly@smit\&.id\&.au)
 .SH "VERSION"
-v0\&.1\&.65
+v0\&.1\&.66
 .SH "TITLE"
 goto
 .SH "SUBTITLE"
@@ -62,7 +62,29 @@ LGPL V3\&.0+ LICENSE [https://github.com/grizzlysmit/gzz-goto/gt/blob/main/LICEN
 Top of Document [#table-of-contents]
 .SH Introduction
 
-GOTO is a mixture of a Raku app path\&.raku and a module Paths\&.rakumod that implements it and a set of script to apply them inside a shell instance This is important as you need the scripts to call cd from within the shell process in order to actually change it's current directory otherwise we would only change a subprocesses current directory and then nothing would have been achieved on exit\&. The scripts are \&.goto_bash_aliases \-> /home/grizzlysmit/Projects/elvish/gzz\-goto/bash_aliases in bash and the combination of some lines in your rc\&.elv file and a elevish module gt\&.elv\&.
+GOTO is a mixture of a Raku app path\&.raku and a module Paths\&.rakumod (implemented separately) that implements it and a set of scripts to apply them inside a shell instance This is important as you need the scripts to call cd from within the shell process in order to actually change it's current directory otherwise we would only change a subprocesses current directory and then nothing would have been achieved on exit\&. The scripts are applied by running goto\-init init [\-\-shell=SHELL] [\-\-config=CONFIG\-FILE]\&.
+
+run
+
+.RS 4m
+.EX
+$  goto init \-\-shell=SHELL \-\-config=CONFIGFILE
+
+
+.EE
+.RE
+.P
+where
+.RS 2n
+.IP \(bu 2m
+\-\-shell=SHELL defaults to bash and 
+.RE
+.RS 2n
+.IP \(bu 2m
+\-\-config=CONFIG defults to ~/\&.bashrc for bash and either ~/\&.local/share/elvish/rc\&.elv or $XDG_DATA_HOME/elvish/rc\&.elv if XDG_DATA_HOME is set in your environment
+.RE
+
+\fBNB:\fR no other shells are supported at this time\&.
 
 See gzz\-goto/gt [https://github.com/grizzlysmit/gzz-goto/gt]\&.
 .SS multi sub MAIN(Str:D $key \-\-> int)

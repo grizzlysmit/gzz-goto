@@ -411,7 +411,18 @@ fn g {|@_args|
 </pre>
 <p><a href="#table-of-contents">Top of Document</a></p>
 <h1 id="Introduction"><a class="u" href="#___top" title="go to top of document">Introduction</a></h1>
-<p>GOTO is a mixture of a Raku app path.raku and a module Paths.rakumod that implements it and a set of script to apply them inside a shell instance This is important as you need the scripts to call cd from within the shell process in order to actually change it&#39;s current directory otherwise we would only change a subprocesses current directory and then nothing would have been achieved on exit. The scripts are .goto_bash_aliases -&gt; /home/grizzlysmit/Projects/elvish/gzz-goto/bash_aliases in bash and the combination of some lines in your rc.elv file and a elevish module gt.elv.</p>
+<p>GOTO is a mixture of a Raku app path.raku and a module Paths.rakumod (implemented separately) that implements it and a set of scripts to apply them inside a shell instance This is important as you need the scripts to call cd from within the shell process in order to actually change it&#39;s current directory otherwise we would only change a subprocesses current directory and then nothing would have been achieved on exit. The scripts are applied by running goto-init init [--shell=SHELL] [--config=CONFIG-FILE].</p>
+<p>run</p>
+<pre class="pod-block-code">$  goto init --shell=SHELL --config=CONFIGFILE
+
+</pre>
+<p>where</p>
+<ul><li><p>--shell=SHELL defaults to bash and </p>
+</li>
+<li><p>--config=CONFIG defults to ~/.bashrc for bash and either ~/.local/share/elvish/rc.elv or $XDG_DATA_HOME/elvish/rc.elv if XDG_DATA_HOME is set in your environment</p>
+</li>
+</ul>
+<p><strong>NB:</strong> no other shells are supported at this time.</p>
 <p><a href="https://github.com/grizzlysmit/gzz-goto/gt">See gzz-goto/gt</a>.</p>
 <h2 id="multi_sub_MAIN(Str:D_$key_-->_int)"><a class="u" href="#___top" title="go to top of document">multi sub MAIN(Str:D $key --&gt; int)</a></h2>
 <pre class="pod-block-code">multi sub MAIN(Str:D $key --&gt; int){

@@ -33,11 +33,11 @@ Table of Contents
 
 =end pod
 
-my Version:D $version = v0.1.65;
+my Version:D $version = v0.1.66;
 
 =begin pod
 
-=VERSION v0.1.65
+=VERSION v0.1.66
 =TITLE goto
 =SUBTITLE GOTO is a cd alternative that acts like a database of bookmarks to different places in the directory tree.
 
@@ -63,7 +63,20 @@ L<Top of Document|#table-of-contents>
 
 =head1 Introduction
 
-GOTO is a mixture of a Raku app path.raku and a module Paths.rakumod  that implements it and a set of script to apply them inside a shell instance This is important as you need the scripts to call cd from within the shell process in order to actually change it's current directory otherwise we would only change a subprocesses current directory and then nothing would have been achieved on exit.  The scripts are .goto_bash_aliases -> /home/grizzlysmit/Projects/elvish/gzz-goto/bash_aliases in bash and the combination of some lines in your rc.elv file and a elevish module gt.elv.
+GOTO is a mixture of a Raku app path.raku and a module Paths.rakumod (implemented separately) that implements it and a set of scripts to apply them inside a shell instance This is important as you need the scripts to call cd from within the shell process in order to actually change it's current directory otherwise we would only change a subprocesses current directory and then nothing would have been achieved on exit. The scripts are applied by running goto-init init [--shell=SHELL] [--config=CONFIG-FILE].
+
+run
+=begin code :lang<bash>
+
+$  goto init --shell=SHELL --config=CONFIGFILE
+
+=end code
+
+where
+=item1      --shell=SHELL defaults to bash and 
+=item1      --config=CONFIG defults to ~/.bashrc for bash and either ~/.local/share/elvish/rc.elv or $XDG_DATA_HOME/elvish/rc.elv if XDG_DATA_HOME is set in your environment
+
+B<NB:>  no other shells are supported at this time.
 
 L<See gzz-goto/gt|https://github.com/grizzlysmit/gzz-goto/gt>.
 
