@@ -9,9 +9,9 @@ class Build {
         my Str:D $path = "/usr/lib/perl6/site/bin";
         chdir($path.IO);
         my Proc $r = run 'ln', '-s', "paths.raku",              "goto"                unless "goto".IO               ~~ :l;
-        my Proc $r = run 'ln', '-s', "paths.raku-j",            "goto-j"              unless "goto-j".IO             ~~ :l;
-        my Proc $r = run 'ln', '-s', "paths.raku-js",           "goto-js"             unless "goto-js".IO            ~~ :l;
-        my Proc $r = run 'ln', '-s', "paths.raku-m",            "goto-m"              unless "goto-m".IO             ~~ :l;
+        $r = run 'ln', '-s', "paths.raku-j",            "goto-j"              unless "goto-j".IO             ~~ :l;
+        $r = run 'ln', '-s', "paths.raku-js",           "goto-js"             unless "goto-js".IO            ~~ :l;
+        $r = run 'ln', '-s', "paths.raku-m",            "goto-m"              unless "goto-m".IO             ~~ :l;
         $r = run         'ln', '-s', "paths.raku",              "g"                   unless "g".IO                  ~~ :l;
         $r = run         'ln', '-s', "paths.raku-j",            "g-j"                 unless "g-j".IO                ~~ :l;
         $r = run         'ln', '-s', "paths.raku-js",           "g-js"                unless "g-js".IO               ~~ :l;
