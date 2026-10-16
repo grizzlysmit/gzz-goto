@@ -32,11 +32,11 @@ Table of Contents
 
 =end pod
 
-my Version:D $version = v0.1.64;
+my Version:D $version = v0.1.65;
 
 =begin pod
 
-=VERSION v0.1.64
+=VERSION v0.1.65
 =TITLE goto-init
 =SUBTITLE GOTO is a cd alternative that acts like a database of bookmarks to different places in the directory tree. This is the init program for goto.
 
@@ -243,7 +243,7 @@ multi sub MAIN('init', Str:D :$shell = 'bash', Str:D :$config is copy = '',
             my Str:D $conf = %*ENV«XDG_DATA_HOME».Str // "$home/.local/share";
             $config = "$conf/elvish/rc.elv" if $config eq '';
             my $path = qx[which goto-init.raku];
-            "$config".IO.spurt(qq[\n$elvish"\n], :append);
+            "$config".IO.spurt(qq[\n$elvish\n], :append);
         }
     }
 }
