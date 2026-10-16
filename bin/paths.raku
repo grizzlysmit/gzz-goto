@@ -33,11 +33,11 @@ Table of Contents
 
 =end pod
 
-my Version:D $version = v0.1.69;
+my Version:D $version = v0.1.70;
 
 =begin pod
 
-=VERSION v0.1.69
+=VERSION v0.1.70
 =TITLE goto
 =SUBTITLE GOTO is a cd alternative that acts like a database of bookmarks to different places in the directory tree.
 
@@ -72,7 +72,19 @@ L<See gzz-goto/gt|https://github.com/grizzlysmit/gzz-goto/gt>.
 
 =begin code :lang<raku>
 
-multi sub MAIN(Str:D $key --> int){
+multi sub MAIN(Str:D $key, Bool:D :v(:$version) = False,
+                                            Bool:D :h(:$help) = False,
+                                            Bool:D :n(:nocolor(:$nocolour)) = False --> int){
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     say path($key);
     return 0;
 } 

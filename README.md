@@ -28,7 +28,7 @@ Francis Grizzly Smit (grizzly@smit.id.au)
 VERSION
 =======
 
-v0.1.69
+v0.1.70
 
 TITLE
 =====
@@ -72,7 +72,19 @@ multi sub MAIN(Str:D $key --> int)
 ----------------------------------
 
 ```raku
-multi sub MAIN(Str:D $key --> int){
+multi sub MAIN(Str:D $key, Bool:D :v(:$version) = False,
+                                            Bool:D :h(:$help) = False,
+                                            Bool:D :n(:nocolor(:$nocolour)) = False --> int){
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     say path($key);
     return 0;
 }

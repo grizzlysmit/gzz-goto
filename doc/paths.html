@@ -416,7 +416,19 @@ hr {
 <p><strong>NB:</strong> no other shells are supported at this time.</p>
 <p><a href="https://github.com/grizzlysmit/gzz-goto/gt">See gzz-goto/gt</a>.</p>
 <h2 id="multi_sub_MAIN(Str:D_$key_-->_int)"><a class="u" href="#___top" title="go to top of document">multi sub MAIN(Str:D $key --&gt; int)</a></h2>
-<pre class="pod-block-code">multi sub MAIN(Str:D $key --&gt; int){
+<pre class="pod-block-code">multi sub MAIN(Str:D $key, Bool:D :v(:$version) = False,
+                                            Bool:D :h(:$help) = False,
+                                            Bool:D :n(:nocolor(:$nocolour)) = False --&gt; int){
+    if $help {
+        my %named-args;
+        my @args;
+        say-coloured($*USAGE, $nocolour, |%named-args, |@args);
+        exit 0;
+    }
+    if $version {
+        say version();
+        exit 0;
+    }
     say path($key);
     return 0;
 } 
