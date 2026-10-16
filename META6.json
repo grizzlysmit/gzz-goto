@@ -16,7 +16,7 @@
     "ECMA262Regex",
     "Gzz::Paths"
   ],
-  "description": "GOTO is a mixture of a Raku app path.raku and a module Paths.rakumod (implemented separately) that implements it and a set of scripts to apply them inside a shell instance This is important as you need the scripts to call cd from within the shell process in order to actually change it's current directory otherwise we would only change a subprocesses current directory and then nothing would have been achieved on exit. The scripts are applied by running goto-init init [--shell=SHELL] [--config=CONFIG-FILE].\n\nrun\n goto init --shell=SHELL --config=CONFIGFILE\n\nwhere\n      --shell=SHELL defaults to bash\nand config defults to ~/.bashrc for bash and either ~/.local/share/elvish/rc.elv or $XDG_DATA_HOME/elvish/rc.elv if XDG_DATA_HOME is set in your environment no other shells are supported at this time.",
+  "description": "GOTO is a mixture of a Raku app path.raku and a module Paths.rakumod (implemented separately) that implements it and a set of scripts to apply them inside a shell instance This is important as you need the scripts to call cd from within the shell process in order to actually change it's current directory otherwise we would only change a subprocesses current directory and then nothing would have been achieved on exit. The scripts are applied by running goto-init init [--shell=SHELL] [--config=CONFIG-FILE].\n\nrun\n ```bash\ngoto init --shell=SHELL --config=CONFIGFILE\n```\n\nWhere\n  - `--shell=SHELL` defaults to bash\n   and  - `--config=CONFIG` defults to ~/.bashrc for bash and either ~/.local/share/elvish/rc.elv or $XDG_DATA_HOME/elvish/rc.elv if XDG_DATA_HOME is set in your environment\n\n*NB: no other shells are supported at this time.*",
   "license": "GPL-3.0-or-later",
   "name": "GOTO",
   "perl": "6.d",
@@ -44,5 +44,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.1.66"
+  "version": "0.1.67"
 }

@@ -28,7 +28,7 @@ Francis Grizzly Smit (grizzly@smit.id.au)
 VERSION
 =======
 
-v0.1.66
+v0.1.67
 
 TITLE
 =====
@@ -69,7 +69,7 @@ run
 $  goto init --shell=SHELL --config=CONFIGFILE
 ```
 
-where
+### where
 
   * --shell=SHELL defaults to bash and 
 

@@ -33,11 +33,11 @@ Table of Contents
 
 =end pod
 
-my Version:D $version = v0.1.66;
+my Version:D $version = v0.1.67;
 
 =begin pod
 
-=VERSION v0.1.66
+=VERSION v0.1.67
 =TITLE goto
 =SUBTITLE GOTO is a cd alternative that acts like a database of bookmarks to different places in the directory tree.
 
@@ -72,7 +72,8 @@ $  goto init --shell=SHELL --config=CONFIGFILE
 
 =end code
 
-where
+=head3 where
+
 =item1      --shell=SHELL defaults to bash and 
 =item1      --config=CONFIG defults to ~/.bashrc for bash and either ~/.local/share/elvish/rc.elv or $XDG_DATA_HOME/elvish/rc.elv if XDG_DATA_HOME is set in your environment
 
